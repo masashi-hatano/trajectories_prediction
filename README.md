@@ -1,3 +1,3 @@
-# trajectories_prediction
+# trajectories prediction
 
 This project aims for predicting trajectories of surrounding pedestrians from first-person perspective.
