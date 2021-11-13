@@ -89,7 +89,7 @@ class TrajectoryDataset(Dataset):
         super(TrajectoryDataset, self).__init__()
 
         #self.data_dir = data_dir
-        self.data_dir = 'datasets/original/test1/'
+        self.data_dir = 'datasets/original/test2/'
         self.obs_len = obs_len
         self.pred_len = pred_len
         self.skip = skip
