@@ -3,6 +3,7 @@ import os
 import torch
 
 from attrdict import AttrDict
+from torch.utils import data
 
 from sgan.data.loader import data_loader
 from sgan.models import TrajectoryGenerator
@@ -74,7 +75,6 @@ def evaluate(args, loader, generator, num_samples):
                 pred_traj_fake = relative_to_abs(
                     pred_traj_fake_rel, obs_traj[-1]
                 )
-                print(pred_traj_fake)
                 ade.append(displacement_error(
                     pred_traj_fake, pred_traj_gt, mode='raw'
                 ))
@@ -89,7 +89,33 @@ def evaluate(args, loader, generator, num_samples):
             fde_outer.append(fde_sum)
         ade = sum(ade_outer) / (total_traj * args.pred_len)
         fde = sum(fde_outer) / (total_traj)
-        return ade, fde
+        return ade, fde, pred_traj_fake
+
+def createPredictedDataFile(data_dir, pred_traj_fake):
+    data_list = []
+    id_list = []
+    with open(data_dir+'/sample.txt') as f:
+        for line in f:
+            data_list.append(line.rstrip().split('\t'))
+            if data_list[-1][1] not in id_list:
+                id_list.append(data_list[-1][1])
+
+    data_pred_list = []
+    counter = []
+    for i in range(len(id_list)):
+        counter.append(0)
+    for i in range(len(data_list)):
+        if data_list[i][2] == '0' and data_list[i][3] == '0':
+            for j in range(len(id_list)):
+                if data_list[i][1] == id_list[j]:
+                    data_pred_list.append([data_list[i][0], id_list[j], str(pred_traj_fake[counter[j]][j][0].item()), str(pred_traj_fake[counter[j]][j][1].item())])
+                    counter[j] += 1
+    with open(data_dir+'output.txt', 'w') as f:
+        for i in range(len(data_pred_list)):
+            f.write(data_pred_list[i][0]+'\t'
+            +data_pred_list[i][1]+'\t'
+            +data_pred_list[i][2]+'\t'
+            +data_pred_list[i][3]+'\n')
 
 
 def main(args):
@@ -108,8 +134,9 @@ def main(args):
         generator = get_generator(checkpoint)
         _args = AttrDict(checkpoint['args'])
         path = get_dset_path(_args.dataset_name, args.dset_type)
-        _, loader = data_loader(_args, path)
-        ade, fde = evaluate(_args, loader, generator, args.num_samples)
+        dset, loader = data_loader(_args, path)
+        _, _, pred_traj_fake = evaluate(_args, loader, generator, args.num_samples)
+        createPredictedDataFile(dset.data_dir, pred_traj_fake)
         #print('Dataset: {}, Pred Len: {}, ADE: {:.2f}, FDE: {:.2f}'.format(_args.dataset_name, _args.pred_len, ade, fde))
 
 
