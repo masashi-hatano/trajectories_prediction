@@ -70,20 +70,22 @@ def get_foot_coordinates(path_image):
     # resize resized image to the original scale
     result = cv2.resize(res, dsize=(image.shape[1], image.shape[0]), interpolation=cv2.INTER_CUBIC)
 
-    #plt.imshow(result)
-    #plt.show()
+    plt.imshow(result)
+    plt.show()
 
     return coordinates, image
 
 def screenToCamera(pixel_x, pixel_y, image):
-    f = 1.0/(2.0* tan(np.radians(120)/2.0))*image.shape[1]
+    f = 1.0/(2.0* tan(np.radians(120)/2.0))
+    ky = image.shape[0]
     C_u = image.shape[1]/2
     C_v = image.shape[0]/2
-    x_camera = (pixel_x-C_u)/f
-    y_camera = (pixel_y-C_v)/f
-    z_camera = 1
+    x_camera = (pixel_y-C_v)/(f*ky)
+    y_camera = (pixel_x-C_u)/(f*ky)
+    z_camera = -1
     temporary_coordinate_camera = np.array([x_camera, y_camera, z_camera])
-    return temporary_coordinate_camera
+    temporary_coordinate_camera_ = np.array([0,0,-1])
+    return temporary_coordinate_camera_
 
 def cameraToWorld(temporary_coordinate_camera, R, X, Y, Z):
     coordinate_camera = np.array([X,Y,Z]).reshape(3,1)
@@ -118,19 +120,23 @@ def calculateRealCoordinate(X, Y, Z, direction, h):
 
 
 time = []
-with open('timestamp.txt') as f:
+with open('timestamp1.txt') as f:
     for line in f:
         time.append(line.strip())
 
 data = []
 for i in range(len(time)):
     coordinates, image = get_foot_coordinates('images/'+time[i]+'.jpg')
+    print(coordinates)
     for j in range(len(coordinates)):
         temporary_coordinate_camera = screenToCamera(coordinates[0][0], coordinates[0][1], image)
         print(int(time[i]))
+        print(temporary_coordinate_camera)
         R, X, Y, Z = get_data_from_csv('1125_1537_36.csv', int(time[i]))
         temporary_coordinate_world, direction = cameraToWorld(temporary_coordinate_camera, R, X, Y, Z)
-        x_real, z_real = calculateRealCoordinate(X, Y, Z, direction, -1.2)
+        print(temporary_coordinate_world)
+        print(direction)
+        x_real, z_real = calculateRealCoordinate(X, Y, Z, direction, -1.35)
         print(x_real)
         print(z_real)
         data.append([time[i], str(j+1), str(x_real), str(z_real)])
