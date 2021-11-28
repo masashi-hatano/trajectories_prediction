@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from numpy import tan
+from numpy import tan, sqrt
 
 def get_foot_coordinates(path_image):
     image = plt.imread(path_image)
@@ -70,28 +70,10 @@ def get_foot_coordinates(path_image):
     # resize resized image to the original scale
     result = cv2.resize(res, dsize=(image.shape[1], image.shape[0]), interpolation=cv2.INTER_CUBIC)
 
-    plt.imshow(result)
-    plt.show()
+    #plt.imshow(result)
+    #plt.show()
 
     return coordinates, image
-
-def screenToCamera(pixel_x, pixel_y, image):
-    f = 1.0/(2.0* tan(np.radians(120)/2.0))
-    ky = image.shape[0]
-    C_u = image.shape[1]/2
-    C_v = image.shape[0]/2
-    x_camera = (pixel_y-C_v)/(f*ky)
-    y_camera = (pixel_x-C_u)/(f*ky)
-    z_camera = -1
-    temporary_coordinate_camera = np.array([x_camera, y_camera, z_camera])
-    temporary_coordinate_camera_ = np.array([0,0,-1])
-    return temporary_coordinate_camera_
-
-def cameraToWorld(temporary_coordinate_camera, R, X, Y, Z):
-    coordinate_camera = np.array([X,Y,Z]).reshape(3,1)
-    temporary_coordinate_world = np.dot(R, (temporary_coordinate_camera).reshape(3,1)) + coordinate_camera
-    direction = temporary_coordinate_world-coordinate_camera
-    return temporary_coordinate_world, direction
 
 def get_data_from_csv(path_csv, time):
     df = pd.read_csv(path_csv)
@@ -105,12 +87,42 @@ def get_data_from_csv(path_csv, time):
     r20 = df['r20'].iloc[0]
     r21 = df['r21'].iloc[0]
     r22 = df['r22'].iloc[0]
+    fx = df['fx'].iloc[0]
+    ox = df['ox'].iloc[0]
+    fy = df['fy'].iloc[0]
+    oy = df['oy'].iloc[0]
 
     R = np.array([[r00,r01,r02],[r10,r11,r12],[r20,r21,r22]])
+    K = np.array([[fx,0,ox],[0,fy,oy],[0,0,1]])
     X = df['t0'].iloc[0]
     Y = df['t1'].iloc[0]
     Z = df['t2'].iloc[0]
-    return R, X, Y, Z
+    return R, K, X, Y, Z
+
+def screenToCamera(coordinates, image, K):
+    u = coordinates[0][0]
+    v = coordinates[0][1]
+    ox = K[0,2]
+    oy = K[1,2]
+    fx = K[0,0]
+    fy = K[1,1]
+
+    coordinate_screen = np.array([v,u,1]).reshape(3,1)
+    K_inv = np.linalg.inv(K)
+    
+    x_camera = (v-ox)/fx
+    y_camera = (u-oy)/fy
+    z_camera = -1
+    
+    temporary_coordinate_camera = np.array([x_camera, y_camera, z_camera])
+    temporary_coordinate_camera_ = np.array([0,0,-1])
+    return temporary_coordinate_camera
+
+def cameraToWorld(temporary_coordinate_camera, R, X, Y, Z):
+    coordinate_camera = np.array([X,Y,Z]).reshape(3,1)
+    temporary_coordinate_world = np.dot(R, (temporary_coordinate_camera).reshape(3,1)) + coordinate_camera
+    direction = temporary_coordinate_world-coordinate_camera
+    return temporary_coordinate_world, direction
 
 def calculateRealCoordinate(X, Y, Z, direction, h):
     t = (h-Y)/direction[1][0]
@@ -118,9 +130,8 @@ def calculateRealCoordinate(X, Y, Z, direction, h):
     z_real = Z + direction[2][0]*t
     return x_real, z_real
 
-
 time = []
-with open('timestamp1.txt') as f:
+with open('timestamp.txt') as f:
     for line in f:
         time.append(line.strip())
 
@@ -129,13 +140,13 @@ for i in range(len(time)):
     coordinates, image = get_foot_coordinates('images/'+time[i]+'.jpg')
     print(coordinates)
     for j in range(len(coordinates)):
-        temporary_coordinate_camera = screenToCamera(coordinates[0][0], coordinates[0][1], image)
         print(int(time[i]))
+        R, K, X, Y, Z = get_data_from_csv('1128_1410_19.csv', int(time[i]))
+        temporary_coordinate_camera = screenToCamera(coordinates, image, K)
         print(temporary_coordinate_camera)
-        R, X, Y, Z = get_data_from_csv('1125_1537_36.csv', int(time[i]))
         temporary_coordinate_world, direction = cameraToWorld(temporary_coordinate_camera, R, X, Y, Z)
         print(temporary_coordinate_world)
-        print(direction)
+        #print(direction)
         x_real, z_real = calculateRealCoordinate(X, Y, Z, direction, -1.35)
         print(x_real)
         print(z_real)
