@@ -1,13 +1,11 @@
-from os import readlink
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from numpy.lib.type_check import real
 import pandas as pd
-from numpy import tan, sqrt
 
 def get_foot_coordinates(path_image):
-    image = plt.imread(path_image)
+    im = plt.imread(path_image)
+    image = cv2.rotate(im, cv2.ROTATE_90_CLOCKWISE)
     res = cv2.resize(image, dsize=(416, 416), interpolation=cv2.INTER_CUBIC)
 
     classes = []
@@ -72,8 +70,8 @@ def get_foot_coordinates(path_image):
     # resize resized image to the original scale
     result = cv2.resize(res, dsize=(image.shape[1], image.shape[0]), interpolation=cv2.INTER_CUBIC)
 
-    #plt.imshow(result)
-    #plt.show()
+    plt.imshow(result)
+    plt.show()
 
     return coordinates, image
 
@@ -103,22 +101,22 @@ def get_data_from_csv(path_csv, time):
     return R, K, T
 
 def screenToCamera(coordinates, image, K):
-    u = coordinates[0][0]
-    v = coordinates[0][1]
+    u = coordinates[0]
+    v = coordinates[1]
     ox = K[0,2]
     oy = K[1,2]
     fx = K[0,0]
     fy = K[1,1]
 
-    coordinate_screen = np.array([v,u,1]).reshape(3,1)
-    K_inv = np.linalg.inv(K)
+    #coordinate_screen = np.array([v,u,1]).reshape(3,1)
+    #K_inv = np.linalg.inv(K)
     
-    x_camera = (v-image.shape[0]/2)/fx
-    y_camera = (u-image.shape[1]/2)/fy
+    x_camera = (v-ox)/fx
+    y_camera = (u-(image.shape[1]-oy))/fy
     z_camera = -1
     
     temporary_coordinate_camera = np.array([x_camera, y_camera, z_camera]).reshape(3,1)
-    temporary_coordinate_camera_ = np.array([0,0,-6.05902430]).reshape(3,1)
+    temporary_coordinate_camera_ = np.array([0,0,-1]).reshape(3,1)
     return temporary_coordinate_camera
 
 def cameraToWorld(temporary_coordinate_camera, R, T):
@@ -138,7 +136,7 @@ def worldToCamera(real_coordinate, R, T):
     return real_coordinate_camera
 
 time = []
-with open('timestamp1.txt') as f:
+with open('timestamp.txt') as f:
     for line in f:
         time.append(line.strip())
 
@@ -146,21 +144,22 @@ data = []
 for i in range(len(time)):
     coordinates, image = get_foot_coordinates('images/'+time[i]+'.jpg')
     print(coordinates)
-    for j in range(len(coordinates)):
-        print(int(time[i]))
-        R, K, T = get_data_from_csv('1128_1410_19.csv', int(time[i]))
-        temporary_coordinate_camera = screenToCamera(coordinates, image, K)
-        print(temporary_coordinate_camera)
-        temporary_coordinate_world, direction = cameraToWorld(temporary_coordinate_camera, R, T)
-        print(temporary_coordinate_world)
-        tcw_inv = worldToCamera(temporary_coordinate_world, R, T)
-        #print(tcw_inv)
-        #print(direction)
-        real_coordinate = calculateRealCoordinate(T, direction, -1.35)
-        print(real_coordinate)
-        real_coordinate_camera = worldToCamera(real_coordinate, R, T)
-        #print(real_coordinate_camera)
-        data.append([time[i], str(j+1), str(real_coordinate[0][0]), str(real_coordinate[2][0])])
+    #for j in range(len(coordinates)):
+    index = int(input("Input index number:"))
+    print(int(time[i]))
+    R, K, T = get_data_from_csv('1207_1444_12.csv', int(time[i]))
+    temporary_coordinate_camera = screenToCamera(coordinates[index], image, K)
+    print(temporary_coordinate_camera)
+    temporary_coordinate_world, direction = cameraToWorld(temporary_coordinate_camera, R, T)
+    print(temporary_coordinate_world)
+    tcw_inv = worldToCamera(temporary_coordinate_world, R, T)
+    #print(tcw_inv)
+    #print(direction)
+    real_coordinate = calculateRealCoordinate(T, direction, -1.35)
+    print(real_coordinate)
+    real_coordinate_camera = worldToCamera(real_coordinate, R, T)
+    #print(real_coordinate_camera)
+    data.append([time[i], str(1), str(real_coordinate[0][0]), str(real_coordinate[2][0])])
 
 with open('datasets/original/scean1/data.txt', 'w') as f:
     for i in range(len(data)):
