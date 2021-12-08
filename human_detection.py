@@ -135,6 +135,7 @@ def worldToCamera(real_coordinate, R, T):
     real_coordinate_camera = np.dot(R.T, (real_coordinate-T))
     return real_coordinate_camera
 
+'''
 time = []
 with open('timestamp.txt') as f:
     for line in f:
@@ -167,3 +168,4 @@ with open('datasets/original/scean1/data.txt', 'w') as f:
         +data[i][1]+'\t'
         +data[i][2]+'\t'
         +data[i][3]+'\n')
+'''

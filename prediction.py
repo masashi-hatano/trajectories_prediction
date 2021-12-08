@@ -94,7 +94,7 @@ def evaluate(args, loader, generator, num_samples):
 def createPredictedDataFile(data_dir, pred_traj_fake):
     data_list = []
     id_list = []
-    with open(data_dir+'/sample.txt') as f:
+    with open(data_dir+'/data.txt') as f:
         for line in f:
             data_list.append(line.rstrip().split('\t'))
             if data_list[-1][1] not in id_list:
