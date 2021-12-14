@@ -34,9 +34,6 @@ def screenToCamera(coordinates, image, K):
     oy = K[1,2]
     fx = K[0,0]
     fy = K[1,1]
-
-    #coordinate_screen = np.array([v,u,1]).reshape(3,1)
-    #K_inv = np.linalg.inv(K)
     
     x_camera = (v-ox)/fx
     y_camera = (u-(image.shape[1]-oy))/fy
@@ -66,24 +63,28 @@ def createDataText(path, data):
             +data[i][2]+'\t'
             +data[i][3]+'\n')
 
-time = []
-with open('timestamp1.txt') as f:
-    for line in f:
-        time.append(line.strip())
+def main():
+    time = []
+    with open('timestamp1.txt') as f:
+        for line in f:
+            time.append(line.strip())
 
-data = []
-for i in range(len(time)):
-    coordinates, image = get_foot_coordinates('images/'+time[i]+'.jpg')
-    print(coordinates)
-    index = int(input("Input index number:"))
-    print(int(time[i]))
-    R, K, T = get_data_from_csv('1207_1444_12.csv', int(time[i]))
-    temporary_coordinate_camera = screenToCamera(coordinates[index], image, K)
-    print(temporary_coordinate_camera)
-    temporary_coordinate_world, direction = cameraToWorld(temporary_coordinate_camera, R, T)
-    print(temporary_coordinate_world)
-    real_coordinate = calculateRealCoordinate(T, direction, -1.35)
-    print(real_coordinate)
-    data.append([time[i], str(1), str(real_coordinate[0][0]), str(real_coordinate[2][0])])
+    data = []
+    for i in range(len(time)):
+        coordinates, image = get_foot_coordinates('images/'+time[i]+'.jpg')
+        print(coordinates)
+        index = int(input("Input index number:"))
+        print(int(time[i]))
+        R, K, T = get_data_from_csv('1207_1444_12.csv', int(time[i]))
+        temporary_coordinate_camera = screenToCamera(coordinates[index], image, K)
+        print(temporary_coordinate_camera)
+        temporary_coordinate_world, direction = cameraToWorld(temporary_coordinate_camera, R, T)
+        print(temporary_coordinate_world)
+        real_coordinate = calculateRealCoordinate(T, direction, -1.35)
+        print(real_coordinate)
+        data.append([time[i], str(1), str(real_coordinate[0][0]), str(real_coordinate[2][0])])
 
-#createDataText('datasets/original/scean1/data.txt', data)
+    #createDataText('datasets/original/scean1/data.txt', data)
+
+if __name__ == '__main__':
+    main()
