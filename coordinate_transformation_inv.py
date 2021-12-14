@@ -21,17 +21,15 @@ def cameraToScreen(real_coordinate_camera, image, K):
 
 def plot(image, coordinates):
     for i in range(len(coordinates)):
-        cv2.circle(image, coordinates[i], 5, (0,0,255), -1)
-    plt.imshow(image)
-    plt.show()
-    cv2.imwrite('images/result.jpg', image)
+        cv2.circle(image, coordinates[i], 5, (255,0,0), -1)
+    image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    cv2.imwrite('images/result.jpg', image_bgr)
 
 def main():
     time = []
     with open('timestamp.txt') as f:
         for line in f:
             time.append(line.strip())
-    print(time[-1])
     
     predictions = []
     with open('datasets/original/scean1/output.txt') as f:
@@ -49,7 +47,6 @@ def main():
         real_coordinate_camera = worldToCamera(real_coordinate, R, T)
         coordinates.append(cameraToScreen(real_coordinate_camera, image, K))
     
-    print(coordinates)
     plot(image, coordinates)
     
 if __name__ == '__main__':
