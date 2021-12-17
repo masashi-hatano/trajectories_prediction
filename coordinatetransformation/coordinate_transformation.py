@@ -1,3 +1,6 @@
+import sys
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 from human_detection import get_foot_coordinates
@@ -40,7 +43,6 @@ def screenToCamera(coordinates, image, K):
     z_camera = -1
     
     temporary_coordinate_camera = np.array([x_camera, y_camera, z_camera]).reshape(3,1)
-    temporary_coordinate_camera_ = np.array([0,0,-1]).reshape(3,1)
     return temporary_coordinate_camera
 
 def cameraToWorld(temporary_coordinate_camera, R, T):
@@ -84,7 +86,8 @@ def main():
         print(real_coordinate)
         data.append([time[i], str(1), str(real_coordinate[0][0]), str(real_coordinate[2][0])])
 
-    #createDataText('datasets/original/scean1/data.txt', data)
+    sys.path.append(sys.path.append(str(Path('coordinate_transformation.py').resolve().parent.parent)))
+    #createDataText(sys.path[-1]+'\\socialgan\\datasets\\original\\scean1\\data.txt', data)
 
 if __name__ == '__main__':
     main()

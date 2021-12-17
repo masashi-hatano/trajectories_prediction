@@ -11,7 +11,7 @@ from sgan.losses import displacement_error, final_displacement_error
 from sgan.utils import relative_to_abs, get_dset_path
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--model_path', type=str)
+parser.add_argument('--model_path', type=str, default='models/sgan-models/eth_8_model.pt')
 parser.add_argument('--num_samples', default=1, type=int)
 parser.add_argument('--dset_type', default='test', type=str)
 

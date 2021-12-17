@@ -47,7 +47,7 @@ def visualize_result(data, pred, cfg):
     # colorize prediction
     pred_color = colorEncode(pred, colors).astype(np.uint8)
     image_bgr = cv2.cvtColor(pred_color, cv2.COLOR_RGB2BGR)
-    cv2.imwrite('result.jpg', image_bgr)
+    cv2.imwrite('result1.jpg', image_bgr)
 
     # aggregate images and save
     im_vis = np.concatenate((img, pred_color), axis=1)
@@ -144,13 +144,13 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         "--imgs",
-        required=True,
+        default='10218.jpg',
         type=str,
         help="an image path, or a directory name"
     )
     parser.add_argument(
         "--cfg",
-        default="config/ade20k-resnet50dilated-ppm_deepsup.yaml",
+        default="config/ade20k-resnet101dilated-ppm_deepsup.yaml",
         metavar="FILE",
         help="path to config file",
         type=str,

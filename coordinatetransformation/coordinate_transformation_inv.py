@@ -1,3 +1,6 @@
+import sys
+from pathlib import Path
+
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
@@ -32,7 +35,8 @@ def main():
             time.append(line.strip())
     
     predictions = []
-    with open('datasets/original/scean1/output.txt') as f:
+    sys.path.append(str(Path('coordinate_transformation_inv.py').resolve().parent.parent))
+    with open(sys.path[-1]+'\\socialgan\\datasets\\original\\scean1\\output.txt') as f:
         for line in f:
             predictions.append(line.strip().split('\t'))
 
