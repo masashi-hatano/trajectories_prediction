@@ -12,4 +12,4 @@ I used ARkit, which enables us to get information about internal and external ca
 I used socialGAN as model to predict future trajectory of 3.2s for each person.
 
 ## Semantic Segmentation
-I used pretrained model of neural networks, consisting of resnet101dilated as encorder and upernet as decorder, in order to integrate the terrain information with SGAN.
+I used pretrained model of SegFormer, consisting of transformer as encorder and MLP as decorder, in order to integrate the terrain information with SGAN.
