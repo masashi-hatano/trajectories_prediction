@@ -86,7 +86,7 @@ def main():
         print(real_coordinate)
         data.append([time[i], str(1), str(real_coordinate[0][0]), str(real_coordinate[2][0])])
 
-    sys.path.append(sys.path.append(str(Path('coordinate_transformation.py').resolve().parent.parent)))
+    #sys.path.append(sys.path.append(str(Path('ctrans.py').resolve().parent.parent)))
     #createDataText(sys.path[-1]+'\\socialgan\\datasets\\original\\scean1\\data.txt', data)
 
 if __name__ == '__main__':

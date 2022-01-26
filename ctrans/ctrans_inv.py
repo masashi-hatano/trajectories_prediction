@@ -26,7 +26,7 @@ def plot(image, coordinates):
     for i in range(len(coordinates)):
         cv2.circle(image, coordinates[i], 5, (255,0,0), -1)
     image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-    cv2.imwrite('images/result.jpg', image_bgr)
+    cv2.imwrite('images/result_with_boundary.jpg', image_bgr)
 
 def main():
     time = []
@@ -35,8 +35,9 @@ def main():
             time.append(line.strip())
     
     predictions = []
-    sys.path.append(str(Path('coordinate_transformation_inv.py').resolve().parent.parent))
-    with open(sys.path[-1]+'\\socialgan\\datasets\\original\\scean1\\output.txt') as f:
+    sys.path.append(str(Path('ctrans_inv.py').resolve().parent.parent))
+    with open(sys.path[-1]+'\\socialgan\\datasets\\original\\scean1_boundary\\output_with_boundary.txt') as f:
+    #with open(sys.path[-1]+'\\socialgan\\datasets\\original\\scean1\\output.txt') as f:
         for line in f:
             predictions.append(line.strip().split('\t'))
 
