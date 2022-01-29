@@ -22,8 +22,16 @@ def main():
         real_coordinate = calculateRealCoordinate(T, direction, -1.35)
         print(real_coordinate)
         data.append([str(10218), str(100+i), str(real_coordinate[0][0]), str(real_coordinate[2][0])])
+        if i == len(coordinates)-1:
+            temporary_coordinate_camera = screenToCamera([1440,1920], image, K)
+            print(temporary_coordinate_camera)
+            temporary_coordinate_world, direction = cameraToWorld(temporary_coordinate_camera, R, T)
+            print(temporary_coordinate_world)
+            real_coordinate = calculateRealCoordinate(T, direction, -1.35)
+            print(real_coordinate)
+            data.append([str(10218), str(100+i), str(real_coordinate[0][0]), str(real_coordinate[2][0])])
     print(data)
-    createDataText('./data.txt', data)
+    #createDataText('./data.txt', data)
 
 if __name__ == '__main__':
     main()

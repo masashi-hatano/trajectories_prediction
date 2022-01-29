@@ -67,27 +67,38 @@ def createDataText(path, data):
 
 def main():
     time = []
-    with open('timestamp1.txt') as f:
+    with open('timestamp3.txt') as f:
         for line in f:
             time.append(line.strip())
 
     data = []
     for i in range(len(time)):
-        coordinates, image = get_foot_coordinates('images/'+time[i]+'.jpg')
+        coordinates, image = get_foot_coordinates('images/0129_1712_17/'+time[i]+'.jpg')
         print(coordinates)
-        index = int(input("Input index number:"))
-        print(int(time[i]))
-        R, K, T = get_data_from_csv('1207_1444_12.csv', int(time[i]))
-        temporary_coordinate_camera = screenToCamera(coordinates[index], image, K)
-        print(temporary_coordinate_camera)
-        temporary_coordinate_world, direction = cameraToWorld(temporary_coordinate_camera, R, T)
-        print(temporary_coordinate_world)
-        real_coordinate = calculateRealCoordinate(T, direction, -1.35)
-        print(real_coordinate)
-        data.append([time[i], str(1), str(real_coordinate[0][0]), str(real_coordinate[2][0])])
+        j = 0
+        while(j < len(coordinates)):
+            index = int(input("Input index number:"))
+            if index == -1:
+                x = int(input("Input coordinate x: "))
+                y = int(input("Input coordinate y: "))
+                coordinates.append((x,y))
+                print(coordinates)
+                j-=1
+            if index != -2:
+                if index != -1:
+                    print(int(time[i]))
+                    R, K, T = get_data_from_csv('0129_1712_17.csv', int(time[i]))
+                    temporary_coordinate_camera = screenToCamera(coordinates[index], image, K)
+                    print(temporary_coordinate_camera)
+                    temporary_coordinate_world, direction = cameraToWorld(temporary_coordinate_camera, R, T)
+                    print(temporary_coordinate_world)
+                    real_coordinate = calculateRealCoordinate(T, direction, -1.35)
+                    print(real_coordinate)
+                    data.append([time[i], str(j+1), str(real_coordinate[0][0]), str(real_coordinate[2][0])])
+            j+=1
 
-    #sys.path.append(sys.path.append(str(Path('ctrans.py').resolve().parent.parent)))
-    #createDataText(sys.path[-1]+'\\socialgan\\datasets\\original\\scean1\\data.txt', data)
+    sys.path.append(str(Path('ctrans.py').resolve().parent.parent))
+    createDataText(sys.path[-1]+'\\socialgan\\datasets\\original\\scean3\\data.txt', data)
 
 if __name__ == '__main__':
     main()

@@ -26,23 +26,23 @@ def plot(image, coordinates):
     for i in range(len(coordinates)):
         cv2.circle(image, coordinates[i], 5, (255,0,0), -1)
     image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-    cv2.imwrite('images/result_with_boundary.jpg', image_bgr)
+    cv2.imwrite('images/result_four_people.jpg', image_bgr)
 
 def main():
     time = []
-    with open('timestamp.txt') as f:
+    with open('timestamp3.txt') as f:
         for line in f:
             time.append(line.strip())
     
     predictions = []
     sys.path.append(str(Path('ctrans_inv.py').resolve().parent.parent))
-    with open(sys.path[-1]+'\\socialgan\\datasets\\original\\scean1_boundary\\output_with_boundary.txt') as f:
+    with open(sys.path[-1]+'\\socialgan\\datasets\\original\\scean3\\output.txt') as f:
     #with open(sys.path[-1]+'\\socialgan\\datasets\\original\\scean1\\output.txt') as f:
         for line in f:
             predictions.append(line.strip().split('\t'))
 
-    R, K, T = get_data_from_csv('1207_1444_12.csv', int(time[-1]))
-    image_path = 'images/'+time[-1]+'.jpg'
+    R, K, T = get_data_from_csv('0129_1712_17.csv', int(time[-1]))
+    image_path = 'images/0129_1712_17/'+time[-1]+'.jpg'
     im = plt.imread(image_path)
     image = cv2.rotate(im, cv2.ROTATE_90_CLOCKWISE)
 

@@ -94,7 +94,7 @@ def evaluate(args, loader, generator, num_samples):
 def createPredictedDataFile(data_dir, pred_traj_fake):
     data_list = []
     id_list = []
-    with open(data_dir+'data_with_boundary.txt') as f:
+    with open(data_dir+'data.txt') as f:
         for line in f:
             data_list.append(line.rstrip().split('\t'))
             if data_list[-1][1] not in id_list:
@@ -110,7 +110,7 @@ def createPredictedDataFile(data_dir, pred_traj_fake):
                 if data_list[i][1] == id_list[j]:
                     data_pred_list.append([data_list[i][0], id_list[j], str(pred_traj_fake[counter[j]][j][0].item()), str(pred_traj_fake[counter[j]][j][1].item())])
                     counter[j] += 1
-    with open(data_dir+'output_with_boundary.txt', 'w') as f:
+    with open(data_dir+'output.txt', 'w') as f:
         for i in range(len(data_pred_list)):
             f.write(data_pred_list[i][0]+'\t'
             +data_pred_list[i][1]+'\t'
