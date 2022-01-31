@@ -76,7 +76,12 @@ def main():
         coordinates, image = get_foot_coordinates('images/0129_1712_17/'+time[i]+'.jpg')
         print(coordinates)
         j = 0
+        flag=True
         while(j < len(coordinates)):
+            if flag:
+                R, K, T = get_data_from_csv('0129_1712_17.csv', int(time[i]))
+                data.append([time[i], str(0), str(T[0][0]), str(T[2][0])])
+                flag=False
             index = int(input("Input index number:"))
             if index == -1:
                 x = int(input("Input coordinate x: "))
@@ -98,7 +103,7 @@ def main():
             j+=1
 
     sys.path.append(str(Path('ctrans.py').resolve().parent.parent))
-    createDataText(sys.path[-1]+'\\socialgan\\datasets\\original\\scean3\\data.txt', data)
+    createDataText(sys.path[-1]+'\\socialgan\\datasets\\original\\scean3\\data1.txt', data)
 
 if __name__ == '__main__':
     main()

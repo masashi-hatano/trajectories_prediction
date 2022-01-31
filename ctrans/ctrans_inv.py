@@ -22,11 +22,11 @@ def cameraToScreen(real_coordinate_camera, image, K):
     coordinates = (int(u),int(v))
     return coordinates
 
-def plot(image, coordinates):
+def plot(image, coordinates, path):
     for i in range(len(coordinates)):
         cv2.circle(image, coordinates[i], 5, (255,0,0), -1)
     image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-    cv2.imwrite('images/result_four_people.jpg', image_bgr)
+    cv2.imwrite(path, image_bgr)
 
 def main():
     time = []
@@ -36,7 +36,7 @@ def main():
     
     predictions = []
     sys.path.append(str(Path('ctrans_inv.py').resolve().parent.parent))
-    with open(sys.path[-1]+'\\socialgan\\datasets\\original\\scean3\\output.txt') as f:
+    with open(sys.path[-1]+'\\socialgan\\datasets\\original\\scean4\\output.txt') as f:
     #with open(sys.path[-1]+'\\socialgan\\datasets\\original\\scean1\\output.txt') as f:
         for line in f:
             predictions.append(line.strip().split('\t'))
@@ -45,14 +45,18 @@ def main():
     image_path = 'images/0129_1712_17/'+time[-1]+'.jpg'
     im = plt.imread(image_path)
     image = cv2.rotate(im, cv2.ROTATE_90_CLOCKWISE)
+    plt.imshow(image)
+    plt.show()
+    plt.close()
 
     coordinates = []
     for i in range(len(predictions)):
-        real_coordinate = np.array([float(predictions[i][2]),-1.35,float(predictions[i][3])]).reshape(3,1)
-        real_coordinate_camera = worldToCamera(real_coordinate, R, T)
-        coordinates.append(cameraToScreen(real_coordinate_camera, image, K))
+        if predictions[i][1]!=str(0):
+            real_coordinate = np.array([float(predictions[i][2]),-1.35,float(predictions[i][3])]).reshape(3,1)
+            real_coordinate_camera = worldToCamera(real_coordinate, R, T)
+            coordinates.append(cameraToScreen(real_coordinate_camera, image, K))
     
-    plot(image, coordinates)
+    plot(image, coordinates, 'images/result_four_people_1.jpg')
     
 if __name__ == '__main__':
     main()
