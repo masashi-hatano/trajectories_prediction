@@ -1,6 +1,8 @@
 import argparse
 import os
+import sys
 import torch
+import logging
 
 from attrdict import AttrDict
 from torch.utils import data
@@ -11,10 +13,13 @@ from sgan.losses import displacement_error, final_displacement_error
 from sgan.utils import relative_to_abs, get_dset_path
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--model_path', type=str, default='models/sgan-models/eth_8_model.pt')
+parser.add_argument('--model_path', type=str, default=sys.path[0]+'/models/sgan-models/eth_8_model.pt')
 parser.add_argument('--num_samples', default=1, type=int)
 parser.add_argument('--dset_type', default='test', type=str)
 
+FORMAT = '[%(levelname)s: %(filename)s: %(lineno)4d]: %(message)s'
+logging.basicConfig(level=logging.INFO, format=FORMAT, stream=sys.stdout)
+logger = logging.getLogger(__name__)
 
 def get_generator(checkpoint):
     args = AttrDict(checkpoint['args'])
@@ -30,6 +35,7 @@ def get_generator(checkpoint):
         noise_type=args.noise_type,
         noise_mix_type=args.noise_mix_type,
         pooling_type=args.pooling_type,
+        #pooling_type="spool",
         pool_every_timestep=args.pool_every_timestep,
         dropout=args.dropout,
         bottleneck_dim=args.bottleneck_dim,
@@ -132,6 +138,7 @@ def main(args):
     for path in paths:
         checkpoint = torch.load(path, map_location=torch.device('cpu'))
         generator = get_generator(checkpoint)
+        logger.info(generator)
         _args = AttrDict(checkpoint['args'])
         path = get_dset_path(_args.dataset_name, args.dset_type)
         dset, loader = data_loader(_args, path)
