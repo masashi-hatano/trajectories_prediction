@@ -93,17 +93,18 @@ def main(text, csv):
                 if index != -1:
                     print(int(time[i]))
                     R, K, T = get_data_from_csv('csv/'+csv+'.csv', int(time[i]))
-                    temporary_coordinate_camera = screenToCamera(coordinates[index], image, K)
+                    temporary_coordinate_camera = screenToCamera(coordinates[j], image, K)
                     print(temporary_coordinate_camera)
                     temporary_coordinate_world, direction = cameraToWorld(temporary_coordinate_camera, R, T)
                     print(temporary_coordinate_world)
                     real_coordinate = calculateRealCoordinate(T, direction, -1.35)
                     print(real_coordinate)
-                    data.append([time[i], str(j+1), str(real_coordinate[0][0]), str(real_coordinate[2][0])])
+                    data.append([time[i], str(index), str(real_coordinate[0][0]), str(real_coordinate[2][0])])
+                    print(data)
             j+=1
 
     sys.path.append(str(Path('ctrans.py').resolve().parent.parent))
-    createDataText(sys.path[-1]+'\\socialgan\\datasets\\original\\scene2\\data.txt', data)
+    createDataText(sys.path[-1]+'\\socialgan\\datasets\\original\\scene5\\data.txt', data)
 
 if __name__ == '__main__':
-    main('timestamp6.txt', '0129_1712_17')
+    main('timestamp5.txt', '0405_1433_18')

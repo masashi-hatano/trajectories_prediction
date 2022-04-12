@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def get_foot_coordinates(path_image):
-    im = plt.imread(path_image)
-    image = cv2.rotate(im, cv2.ROTATE_90_CLOCKWISE)
+    image = plt.imread(path_image)
+    #image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
     res = cv2.resize(image, dsize=(416, 416), interpolation=cv2.INTER_CUBIC)
 
     classes = []
