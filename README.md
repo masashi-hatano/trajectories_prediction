@@ -8,7 +8,7 @@ When getting human's feet coordinates, I used pretrained model of yolov3 and reg
 ## Coordinate Transformation
 I used ARkit, which enables us to get information about internal and external camera matrix. According to these matrices, I did coordinate transformation of the detected person's feet coordinate from screen coordinate to world coordinate, which is compatible with the dataset of trajectory prediction.
 
-## Trajectory Prediction
+## Prediction model
 I used socialGAN as model to predict future trajectory of 3.2s for each person.
 
 ## Semantic Segmentation
