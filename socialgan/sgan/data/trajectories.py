@@ -90,7 +90,7 @@ class TrajectoryDataset(Dataset):
         super(TrajectoryDataset, self).__init__()
 
         #self.data_dir = data_dir
-        self.data_dir = sys.path[0]+'/datasets/original/scean4/'
+        self.data_dir = sys.path[0]+'/datasets/original/scene6/'
         self.obs_len = obs_len
         self.pred_len = pred_len
         self.skip = skip
