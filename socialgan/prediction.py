@@ -3,6 +3,8 @@ import os
 import sys
 import torch
 import logging
+import json
+from pathlib import Path
 
 from attrdict import AttrDict
 from torch.utils import data
@@ -12,10 +14,13 @@ from sgan.models import TrajectoryGenerator
 from sgan.losses import displacement_error, final_displacement_error
 from sgan.utils import relative_to_abs, get_dset_path
 
+sys.path.append(str(Path('prediction.py').resolve().parent.parent))
+
 parser = argparse.ArgumentParser()
-parser.add_argument('--model_path', type=str, default=sys.path[0]+'/models/sgan-models/eth_8_model.pt')
+parser.add_argument('--model_path', type=str, default=sys.path[0]+'/models/sgan-p-models/eth_8_model.pt')
 parser.add_argument('--num_samples', default=1, type=int)
 parser.add_argument('--dset_type', default='test', type=str)
+parser.add_argument('--folder', default=sys.path[-1]+'/output/0413_1605_24/', type=str)
 
 FORMAT = '[%(levelname)s: %(filename)s: %(lineno)4d]: %(message)s'
 logging.basicConfig(level=logging.INFO, format=FORMAT, stream=sys.stdout)
@@ -123,8 +128,38 @@ def createPredictedDataFile(data_dir, pred_traj_fake):
             +data_pred_list[i][2]+'\t'
             +data_pred_list[i][3]+'\n')
 
+def convertToJson(folder, data_dir, pred_traj_fake):
+    data_list = []
+    time_list = []
+    PredTimeList = []
+    counter = 0
+    with open(data_dir+'data.txt') as f:
+        for line in f:
+            if counter >= pred_traj_fake.shape[1]:
+                break
+            data_list.append(line.rstrip().split('\t'))
+            if data_list[-1][0] not in time_list:
+                time_list.append(data_list[-1][0])
+                if len(time_list) >= 8:
+                    pred_traj=[]
+                    for i in range(8):
+                        pred_traj.append(pred_traj_fake[i][counter].tolist())
+                    dict = {"time_start":data_list[-1][0], "PedList":[{"index":data_list[-1][1], "pred_traj":pred_traj}]}
+                    PredTimeList.append(dict)
+                    counter+=1
+            elif len(time_list) >= 8:
+                pred_traj=[]
+                for i in range(8):
+                    pred_traj.append(pred_traj_fake[i][counter].tolist())
+                dict = {"index":data_list[-1][1], "pred_traj":pred_traj}
+                PredTimeList[-1]["PedList"].append(dict)
+                counter+=1
+    dict_all = {"PredTimeList":PredTimeList}
+    with open(folder+"pred_traj.json", "w") as f:
+        json.dump(dict_all, f, indent=4)
 
 def main(args):
+    folder = args.folder
     if os.path.isdir(args.model_path):
         filenames = os.listdir(args.model_path)
         filenames.sort()
@@ -144,7 +179,8 @@ def main(args):
         dset, loader = data_loader(_args, path)
         _, _, pred_traj_fake = evaluate(_args, loader, generator, args.num_samples)
         print(pred_traj_fake)
-        createPredictedDataFile(dset.data_dir, pred_traj_fake)
+        convertToJson(folder, dset.data_dir, pred_traj_fake)
+        #createPredictedDataFile(dset.data_dir, pred_traj_fake)
         #print('Dataset: {}, Pred Len: {}, ADE: {:.2f}, FDE: {:.2f}'.format(_args.dataset_name, _args.pred_len, ade, fde))
 
 
