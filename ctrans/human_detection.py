@@ -8,7 +8,7 @@ def get_foot_coordinates(path_image):
     res = cv2.resize(image, dsize=(416, 416), interpolation=cv2.INTER_CUBIC)
 
     classes = []
-    with open('coco.names', 'r') as f:
+    with open('yolov3/coco.names', 'r') as f:
         classes = [line.strip() for line in f.readlines()]
 
 

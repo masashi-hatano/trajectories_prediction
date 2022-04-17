@@ -66,6 +66,7 @@ def createDataText(path, data):
             +data[i][3]+'\n')
 
 def main(text, csv):
+    sys.path.append(str(Path('ctrans.py').resolve().parent.parent))
     time = []
     with open('timestamp/'+text) as f:
         for line in f:
@@ -73,13 +74,13 @@ def main(text, csv):
 
     data = []
     for i in range(len(time)):
-        coordinates, image = get_foot_coordinates('images/'+csv+'/'+time[i]+'.jpg')
+        coordinates, image = get_foot_coordinates(sys.path[-1]+'/dataset/images/'+csv+'/'+time[i]+'.jpg')
         print(coordinates)
         j = 0
         flag=True
         while(j < len(coordinates)):
             if flag:
-                R, K, T = get_data_from_csv('csv/'+csv+'.csv', int(time[i]))
+                R, K, T = get_data_from_csv(sys.path[-1]+'/dataset/csv/'+csv+'.csv', int(time[i]))
                 data.append([time[i], str(0), str(T[0][0]), str(T[2][0])])
                 flag=False
             index = int(input("Input index number:"))
@@ -92,7 +93,7 @@ def main(text, csv):
             if index != -2:
                 if index != -1:
                     print(int(time[i]))
-                    R, K, T = get_data_from_csv('csv/'+csv+'.csv', int(time[i]))
+                    R, K, T = get_data_from_csv(sys.path[-1]+'/dataset/csv/'+csv+'.csv', int(time[i]))
                     temporary_coordinate_camera = screenToCamera(coordinates[j], image, K)
                     print(temporary_coordinate_camera)
                     temporary_coordinate_world, direction = cameraToWorld(temporary_coordinate_camera, R, T)
@@ -103,7 +104,6 @@ def main(text, csv):
                     print(data)
             j+=1
 
-    sys.path.append(str(Path('ctrans.py').resolve().parent.parent))
     createDataText(sys.path[-1]+'\\socialgan\\datasets\\original\\scene5\\data.txt', data)
 
 if __name__ == '__main__':
