@@ -4,29 +4,7 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
-from ctrans import get_data_from_csv
-
-def worldToCamera(real_coordinate, R, T):
-    real_coordinate_camera = np.dot(R.T, (real_coordinate-T))
-    return real_coordinate_camera
-
-def cameraToScreen(real_coordinate_camera, image, K):
-    ox = K[0,2]
-    oy = K[1,2]
-    fx = K[0,0]
-    fy = K[1,1]
-
-    u = (fy*real_coordinate_camera[1][0]/abs(real_coordinate_camera[2][0]) + (image.shape[1]-oy))
-    v = (fx*real_coordinate_camera[0][0]/abs(real_coordinate_camera[2][0]) + ox)
-
-    coordinates = (int(u),int(v))
-    return coordinates
-
-def plot(image, coordinates, path):
-    for i in range(len(coordinates)):
-        cv2.circle(image, coordinates[i], 5, (255,0,0), -1)
-    image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-    cv2.imwrite(path, image_bgr)
+from utils.util import get_data_from_csv, worldToCamera, cameraToScreen, plot
 
 def main():
     time = []
