@@ -7,7 +7,7 @@ import os
 # human detection
 def get_foot_coordinates(path_image):
     image = plt.imread(path_image)
-    #image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+    image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
     res = cv2.resize(image, dsize=(416, 416), interpolation=cv2.INTER_CUBIC)
 
     classes = []
