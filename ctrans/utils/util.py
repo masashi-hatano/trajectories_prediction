@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import os
 
 # human detection
 def get_foot_coordinates(path_image):
@@ -193,3 +194,30 @@ def extract_coordinates(R,K,T,mask_image):
                 else:
                     counter+=1
     return coordinates
+
+
+# timestamp generation
+def filename_list(directory):
+    imgs = os.listdir(directory)
+    for i, filename in enumerate(imgs):
+        imgs[i] = filename.replace('.jpg','')
+    imgs.sort(key=int)
+    return imgs
+
+def extract_imgs(imgs):
+    imgs_extracted = []
+    imgs_extracted.append(imgs[0])
+    time_next = int(imgs[0])+400
+    for i in range(2,len(imgs)):
+        diff_1 = abs(time_next-int(imgs[i-1]))
+        diff_2 = abs(time_next-int(imgs[i]))
+        if diff_1 < diff_2:
+            imgs_extracted.append(imgs[i-1])
+            time_next = int(imgs[i-1])+400
+    return imgs_extracted
+
+def create_timestamp(path, imgs_extracted):
+    with open(path, 'w') as f:
+        for i in range(len(imgs_extracted)):
+            f.write(imgs_extracted[i]+'\n')
+
