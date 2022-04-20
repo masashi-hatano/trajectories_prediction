@@ -155,8 +155,60 @@ def convertToJson(folder, data_dir, pred_traj_fake):
                 PredTimeList[-1]["PedList"].append(dict)
                 counter+=1
     dict_all = {"PredTimeList":PredTimeList}
+    dict = sortJson(dict_all)
     with open(folder+"pred_traj.json", "w") as f:
-        json.dump(dict_all, f, indent=4)
+        json.dump(dict, f, indent=4)
+
+def sortJson(dict):
+    predlist = dict["PredTimeList"]
+    counter=0
+    inverse = False
+    while counter < len(predlist)-1:
+        if not inverse:
+            dict1_after, dict2_after, changed = sort(predlist[counter], predlist[counter+1])
+            if changed:
+                predlist = change(predlist, counter, inverse, dict1_after, dict2_after)
+                if counter > 0:
+                    inverse = True
+                else:
+                    counter+=1
+            else:
+                counter+=1
+        else:
+            dict1_after, dict2_after, changed = sort(predlist[counter-1], predlist[counter])
+            if changed:
+                predlist = change(predlist, counter, inverse, dict1_after, dict2_after)
+                if counter > 1:
+                    inverse = True
+                    counter-=1
+                else:
+                    inverse = False
+            else:
+                inverse = False
+                counter+=1
+    dict["PredTimeList"] = predlist
+    return dict
+
+def sort(dict1, dict2):
+    changed = False
+    if dict1["PedList"][0]["pred_traj"][0][1] > dict2["PedList"][0]["pred_traj"][0][1]:
+        dict1_after = dict1
+        dict2_after = dict2
+    else:
+        dict1_after = dict2
+        dict2_after = dict1
+        changed = True
+    return dict1_after, dict2_after, changed
+
+def change(predlist, index, inverse, dict1, dict2):
+    dict1["PedList"], dict2["PedList"] = dict2["PedList"], dict1["PedList"]
+    if not inverse:
+        predlist[index] = dict2
+        predlist[index+1] = dict1
+    else:
+        predlist[index-1] = dict2
+        predlist[index] = dict1
+    return predlist
 
 def main(args):
     folder = args.folder
