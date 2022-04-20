@@ -156,11 +156,18 @@ def cameraToScreen(real_coordinate_camera, image, K):
     coordinates = (int(u),int(v))
     return coordinates
 
-def plot(image, coordinates, path):
+def plot(image, coordinates, path, color=(255,0,0)):
     for i in range(len(coordinates)):
-        cv2.circle(image, coordinates[i], 5, (255,0,0), -1)
+        cv2.circle(image, coordinates[i], 5, color, -1)
+    cv2.imwrite(path, image)
+    return image
+
+def plot_gt(image, coordinates, path, color=(0,255,0)):
+    for i in range(len(coordinates)):
+        cv2.circle(image, coordinates[i], 5, color, -1)
     image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     cv2.imwrite(path, image_bgr)
+    return image_bgr
 
 
 # boundary extraction

@@ -4,37 +4,60 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
-from utils.util import get_data_from_csv, worldToCamera, cameraToScreen, plot
+import json
+from utils.util import get_data_from_csv, worldToCamera, cameraToScreen, plot, plot_gt
 
-def main():
+def main(date):
     time = []
-    with open('timestamp3.txt') as f:
+    with open('timestamp/'+date+'.txt') as f:
         for line in f:
             time.append(line.strip())
     
-    predictions = []
     sys.path.append(str(Path('ctrans_inv.py').resolve().parent.parent))
-    with open(sys.path[-1]+'\\socialgan\\datasets\\original\\scean4\\output.txt') as f:
-    #with open(sys.path[-1]+'\\socialgan\\datasets\\original\\scean1\\output.txt') as f:
+    gt = []
+    with open(sys.path[-1]+'/socialgan/datasets/original/'+date+'/data.txt') as f:
         for line in f:
-            predictions.append(line.strip().split('\t'))
+            gt.append(line.strip().split('\t'))
+    with open(sys.path[-1]+'/output/'+date+'/pred_traj.json') as f:
+        dict_json = json.load(f)
 
-    R, K, T = get_data_from_csv('0129_1712_17.csv', int(time[-1]))
-    image_path = 'images/0129_1712_17/'+time[-1]+'.jpg'
-    im = plt.imread(image_path)
-    image = cv2.rotate(im, cv2.ROTATE_90_CLOCKWISE)
-    plt.imshow(image)
-    plt.show()
-    plt.close()
+    for i in range(7,len(time)-8):
+        R, K, T = get_data_from_csv(sys.path[-1]+'/dataset/csv/'+date+'.csv', int(time[i]))
+        image_path = sys.path[-1]+'/dataset/images/'+date+'/'+time[i]+'.jpg'
+        image = plt.imread(image_path)
+        image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+        #plt.imshow(image)
+        #plt.show()
+        #plt.close()
 
-    coordinates = []
-    for i in range(len(predictions)):
-        if predictions[i][1]!=str(0):
-            real_coordinate = np.array([float(predictions[i][2]),-1.35,float(predictions[i][3])]).reshape(3,1)
-            real_coordinate_camera = worldToCamera(real_coordinate, R, T)
-            coordinates.append(cameraToScreen(real_coordinate_camera, image, K))
+        time_current = []
+        for j in range(1,9):
+            time_current.append(time[i+j])
+        coordinates_gt = []
+        j=0
+        while gt[j][0] not in time_current:
+            j+=1
+        while gt[j][0] in time_current:
+            if gt[j][1]!=str(0):
+                real_coordinate = np.array([float(gt[j][2]),-1.35,float(gt[j][3])]).reshape(3,1)
+                real_coordinate_camera = worldToCamera(real_coordinate, R, T)
+                coordinates_gt.append(cameraToScreen(real_coordinate_camera, image, K))
+            j+=1
+            if j >= len(gt):
+                break
     
-    plot(image, coordinates, 'images/result_four_people_1.jpg')
-    
+        image_ploted = plot_gt(image, coordinates_gt, sys.path[-1]+'/output/'+date+'/result_'+time[i]+'.jpg')
+
+        coordinates_pred = []
+        pedlist = dict_json["PredTimeList"][i-7]["PedList"]
+        for k in range(1,len(pedlist)):
+            pred_traj = pedlist[k]["pred_traj"]
+            for pred_traj_coordinates in pred_traj:
+                real_coordinate = np.array([pred_traj_coordinates[0],-1.35,pred_traj_coordinates[1]]).reshape(3,1)
+                real_coordinate_camera = worldToCamera(real_coordinate, R, T)
+                coordinates_pred.append(cameraToScreen(real_coordinate_camera, image, K))
+        
+        plot(image_ploted,coordinates_pred,sys.path[-1]+'/output/'+date+'/result_'+time[i]+'.jpg')
+
 if __name__ == '__main__':
-    main()
+    main('0413_1605_24')
