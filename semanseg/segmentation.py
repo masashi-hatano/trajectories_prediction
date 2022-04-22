@@ -16,18 +16,22 @@ def paletteToRGB(pred, size, palette):
     pred_rgb = convertToRGB(pred, palette)
     return pred_rgb
 
-def main():
+def parse_args():
     parser = ArgumentParser()
-    parser.add_argument('--img', default='dataset/images/0413_1605_24/13838.jpg', help='Image file')
+    parser.add_argument('--img', default='dataset/images/', help='Image file')
     parser.add_argument('--model', default='nvidia/segformer-b5-finetuned-cityscapes-1024-1024')
     parser.add_argument('--device', default='cuda:0', help='Device used for inference')
     parser.add_argument('--size', default=(1990,1440))
-    parser.add_argument('--savedir', default='hf/output/')
-    parser.add_argument(
-        '--palette',
-        default='cityscapes',
-        help='Color palette used for segmentation map')
+    parser.add_argument('--savedir', default='semanseg/output/')
+    parser.add_argument('--palette', default='cityscapes', help='Color palette used for segmentation map')
+    parser.add_argument('--timestamp', default='ctrans/timestamp/')
+    parser.add_argument('--date', default='0413_1605_24')
+    parser.add_argument('--interval', default=10, type=int)
     args = parser.parse_args()
+    return args
+
+def main():
+    args = parse_args()
 
     # loarding model and feature extraction
     model = SegformerForSemanticSegmentation.from_pretrained(args.model)
@@ -36,31 +40,40 @@ def main():
     # model to device
     device = torch.device(args.device)
     model = model.to(device)
+    
+    with open(args.timestamp+args.date+'.txt') as f:
+        time = []
+        for line in f:
+            time.append(line.strip())
+        
+    for i in range(0,len(time),2*args.interval):
+        # prepare image
+        image = cv2.imread(args.img+args.date+'/'+time[i]+'.jpg')
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-    # prepare image
-    image = cv2.imread(args.img)
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        # test a single image
+        model.to(args.device)
+        model.eval()
+        with torch.no_grad():
+            inputs = feature_extractor(images=image, return_tensors="pt")
+            inputs_tensor = inputs['pixel_values'].cuda()
+            outputs = model(inputs_tensor)
+            pred = outputs.logits
 
-    # test a single image
-    model.to(args.device)
-    model.eval()
-    with torch.no_grad():
-        inputs = feature_extractor(images=image, return_tensors="pt")
-        inputs_tensor = inputs['pixel_values'].cuda()
-        outputs = model(inputs_tensor)
-        pred = outputs.logits
+        # palette to rgb
+        pred_rgb = paletteToRGB(pred, args.size, get_palette(args.palette))
 
-    # palette to rgb
-    pred_rgb = paletteToRGB(pred, args.size, get_palette(args.palette))
+        # create masked image
+        masked = paletteToRGB(pred, args.size, get_palette('mask'))
 
-    # show the results
-    #plt.imshow(pred_rgb)
-    #plt.show()
-    #plt.close()
-
-    # save the segmented image
-    pred_rgb = cv2.cvtColor(pred_rgb, cv2.COLOR_RGB2BGR)
-    cv2.imwrite(args.savedir+'result.jpg', pred_rgb)
+        # save the segmented and masked images
+        pred_rgb = cv2.cvtColor(pred_rgb, cv2.COLOR_RGB2BGR)
+        masked = cv2.cvtColor(masked, cv2.COLOR_BGR2RGB)
+        plt.imshow(masked)
+        plt.show()
+        plt.close()
+        cv2.imwrite(args.savedir+args.date+'/seg/'+time[i]+'.jpg', pred_rgb)
+        cv2.imwrite(args.savedir+args.date+'/mask/'+time[i]+'.jpg', masked)
 
 
 if __name__ == '__main__':

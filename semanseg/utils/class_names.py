@@ -50,6 +50,13 @@ def voc_classes():
         'tvmonitor'
     ]
 
+def mask_palette():
+    """mask palette for external use."""
+    return [[255, 255, 255], [255, 255, 255], [0, 0, 0], [0, 0, 0],
+            [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0],
+            [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0],
+            [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0],
+            [0, 0, 0], [0, 0, 0]]
 
 def cityscapes_palette():
     """Cityscapes palette for external use."""
@@ -112,6 +119,7 @@ def voc_palette():
 
 
 dataset_aliases = {
+    'mask': ['mask'],
     'cityscapes': ['cityscapes'],
     'ade': ['ade', 'ade20k'],
     'voc': ['voc', 'pascal_voc', 'voc12', 'voc12aug']
