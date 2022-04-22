@@ -1,0 +1,67 @@
+from argparse import ArgumentParser
+from transformers import SegformerForSemanticSegmentation, SegformerFeatureExtractor
+import torch
+from torch.nn import functional as F
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2
+
+from utils.util import convertToRGB
+from utils.class_names import get_palette
+
+def paletteToRGB(pred, size, palette):
+    pred = F.interpolate(input=pred, size=size, mode='bilinear', align_corners=False)
+    pred = np.asarray(np.argmax(pred.cpu(), axis=1), dtype=np.uint8)
+    pred = np.squeeze(pred, axis=0)
+    pred_rgb = convertToRGB(pred, palette)
+    return pred_rgb
+
+def main():
+    parser = ArgumentParser()
+    parser.add_argument('--img', default='dataset/images/0413_1605_24/13838.jpg', help='Image file')
+    parser.add_argument('--model', default='nvidia/segformer-b5-finetuned-cityscapes-1024-1024')
+    parser.add_argument('--device', default='cuda:0', help='Device used for inference')
+    parser.add_argument('--size', default=(1990,1440))
+    parser.add_argument('--savedir', default='hf/output/')
+    parser.add_argument(
+        '--palette',
+        default='cityscapes',
+        help='Color palette used for segmentation map')
+    args = parser.parse_args()
+
+    # loarding model and feature extraction
+    model = SegformerForSemanticSegmentation.from_pretrained(args.model)
+    feature_extractor = SegformerFeatureExtractor.from_pretrained(args.model)
+
+    # model to device
+    device = torch.device(args.device)
+    model = model.to(device)
+
+    # prepare image
+    image = cv2.imread(args.img)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+    # test a single image
+    model.to(args.device)
+    model.eval()
+    with torch.no_grad():
+        inputs = feature_extractor(images=image, return_tensors="pt")
+        inputs_tensor = inputs['pixel_values'].cuda()
+        outputs = model(inputs_tensor)
+        pred = outputs.logits
+
+    # palette to rgb
+    pred_rgb = paletteToRGB(pred, args.size, get_palette(args.palette))
+
+    # show the results
+    #plt.imshow(pred_rgb)
+    #plt.show()
+    #plt.close()
+
+    # save the segmented image
+    pred_rgb = cv2.cvtColor(pred_rgb, cv2.COLOR_RGB2BGR)
+    cv2.imwrite(args.savedir+'result.jpg', pred_rgb)
+
+
+if __name__ == '__main__':
+    main()
