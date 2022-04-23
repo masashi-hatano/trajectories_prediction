@@ -9,7 +9,7 @@ from utils.util import get_data_from_csv, worldToCamera, cameraToScreen, plot, p
 
 def main(date):
     time = []
-    with open('timestamp/'+date+'.txt') as f:
+    with open('ctrans/timestamp/'+date+'.txt') as f:
         for line in f:
             time.append(line.strip())
     
@@ -26,6 +26,7 @@ def main(date):
         image_path = sys.path[-1]+'/dataset/images/'+date+'/'+time[i]+'.jpg'
         image = plt.imread(image_path)
         image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         #plt.imshow(image)
         #plt.show()
         #plt.close()
@@ -46,7 +47,7 @@ def main(date):
             if j >= len(gt):
                 break
     
-        image_ploted = plot_gt(image, coordinates_gt, sys.path[-1]+'/output/'+date+'/result_'+time[i]+'.jpg')
+        image_ploted = plot(image, coordinates_gt, sys.path[-1]+'/output/'+date+'/result_'+time[i]+'.jpg', color=(0,255,0))
 
         coordinates_pred = []
         pedlist = dict_json["PredTimeList"][i-7]["PedList"]
