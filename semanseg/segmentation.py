@@ -69,11 +69,8 @@ def main():
         # save the segmented and masked images
         pred_rgb = cv2.cvtColor(pred_rgb, cv2.COLOR_RGB2BGR)
         masked = cv2.cvtColor(masked, cv2.COLOR_BGR2RGB)
-        plt.imshow(masked)
-        plt.show()
-        plt.close()
-        cv2.imwrite(args.savedir+args.date+'/seg/'+time[i]+'.jpg', pred_rgb)
-        cv2.imwrite(args.savedir+args.date+'/mask/'+time[i]+'.jpg', masked)
+        cv2.imwrite(args.savedir+'seg/'+args.date+'/'+time[i]+'.jpg', pred_rgb)
+        cv2.imwrite(args.savedir+'mask/'+args.date+'/'+time[i]+'.jpg', masked)
 
 
 if __name__ == '__main__':
