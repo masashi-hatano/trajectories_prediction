@@ -5,9 +5,9 @@ This project aims for predicting trajectories of surrounding pedestrians from fi
 ## Introduction
 Predicting trajectory of pedestrians is one of the key factors for a better society such as automatic driving, guide for blind people, and social robots interacting with human. This task has been done by following existing methods, but these are not good enough.
 
-- Predicting from bird's-eye coordinate:
+- Predicting from bird's-eye coordinate:  
 Models using bird's-eye coordinate are, in fact, impractical in terms of ubiquitousness and availability of surveillance camera, which provides bird's-eye images.
-- Predicting from first-person perspective:
+- Predicting from first-person perspective:  
 Models predicting trajectories from first-person perspective need a variety of information, and thus are complex, overall. Since the objective is to be applied not only to intelligent driving, but also guidance for the visually impaired and social robots, it is obvious that a simpler model is better.
 
 The advantages of proposal method are as follows:
