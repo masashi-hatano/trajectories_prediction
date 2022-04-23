@@ -186,8 +186,8 @@ def extract_coordinates(R,K,T,mask_image):
                 pass
             else:
                 rgb = mask_image[v][u]
-                if rgb[0]==128 and rgb[1]==63 and rgb[2]==127:
-                    color = "violet"
+                if (rgb==np.array([255,255,255])).all():
+                    color = "white"
                 else:
                     color = "black"
 
