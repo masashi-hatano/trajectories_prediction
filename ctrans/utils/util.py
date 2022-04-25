@@ -162,26 +162,16 @@ def plot(image, coordinates, path, color=(255,0,0)):
     cv2.imwrite(path, image)
     return image
 
-def plot_gt(image, coordinates, path, color=(0,255,0)):
-    for i in range(len(coordinates)):
-        cv2.circle(image, coordinates[i], 5, color, -1)
-    image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-    cv2.imwrite(path, image_bgr)
-    return image_bgr
-
-
 # boundary extraction
 def extract_coordinates(R,K,T,mask_image):
     coordinates=[]
     counter=100
-    for delta_z in range(16):
+    for delta_z in range(20):
         pre_color = None
         for delta_x in range(-500,501):
             real_coordinate = np.array([T[0][0]+0.01*delta_x,-1.35,T[2][0]-1*delta_z]).reshape(3,1)
-            #print(real_coordinate)
             real_coordinate_camera = worldToCamera(real_coordinate, R, T)
             u,v = cameraToScreen(real_coordinate_camera, mask_image, K)
-            #print([u,v])
             if u<0 or u>=1440 or v<0 or v>=1920:
                 pass
             else:
@@ -201,6 +191,33 @@ def extract_coordinates(R,K,T,mask_image):
                 else:
                     counter+=1
     return coordinates
+
+def fuseTerrainInfo(inputdir, date, terrain_data):
+    data=[]
+    with open(inputdir+date+'/withoutSS/data.txt') as f:
+        for line in f:
+            data.append(line.strip().split('\t'))
+    fused = []
+    for i in range(len(data)):
+        if i == 0:
+            fused.append(data[0])
+        if i == len(data)-1:
+            for j in range(len(terrain_data)):
+                terrain = []
+                terrain.append(data[i][0])
+                for k in range(1, len(terrain_data[j])):
+                    terrain.append(terrain_data[j][k])
+                fused.append(terrain)
+        else:
+            if data[i][0] != data[i+1][0]:
+                for j in range(len(terrain_data)):
+                    terrain = []
+                    terrain.append(data[i][0])
+                    for k in range(1, len(terrain_data[j])):
+                        terrain.append(terrain_data[j][k])
+                    fused.append(terrain)
+            fused.append(data[i+1])
+    return fused
 
 
 # timestamp generation
