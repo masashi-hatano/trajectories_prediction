@@ -26,7 +26,7 @@ def parse_args():
     parser.add_argument('--palette', default='cityscapes', help='Color palette used for segmentation map')
     parser.add_argument('--timestamp', default='ctrans/timestamp/')
     parser.add_argument('--date', default='0413_1605_24')
-    parser.add_argument('--interval', default=10, type=int)
+    parser.add_argument('--interval', default=20, type=int)
     args = parser.parse_args()
     return args
 
@@ -46,7 +46,7 @@ def main():
         for line in f:
             time.append(line.strip())
         
-    for i in range(0,len(time),2*args.interval):
+    for i in range(0,len(time),int(1.6*args.interval)):
         # prepare image
         image = cv2.imread(args.img+args.date+'/'+time[i]+'.jpg')
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
