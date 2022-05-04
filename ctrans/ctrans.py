@@ -1,24 +1,28 @@
-import sys
 from pathlib import Path
 
 from utils.util import get_foot_coordinates, get_data_from_csv, screenToCamera, cameraToWorld, calculateRealCoordinate, createDataText
 
 def main(date):
-    sys.path.append(str(Path('ctrans.py').resolve().parent.parent))
     time = []
-    with open('timestamp/'+date+'.txt') as f:
+    data = []
+    path_timestamp = Path('ctrans/timestamp', date+'.txt')
+    path_img = Path('dataset/images', date)
+    path_csv = Path('dataset/csv',date+'.csv')
+    path_input = Path('socialgan/datasets/original',date,'data.txt')
+
+    with open(path_timestamp) as f:
         for line in f:
             time.append(line.strip())
 
-    data = []
     for i in range(len(time)):
-        coordinates, image = get_foot_coordinates(sys.path[-1]+'/dataset/images/'+date+'/'+time[i]+'.jpg')
+        path_img = path_img / Path(time[i]+'.jpg')
+        coordinates, image = get_foot_coordinates(path_img)
         print(coordinates)
         j = -1
         flag=True
         while(j < len(coordinates)):
             if flag:
-                R, K, T = get_data_from_csv(sys.path[-1]+'/dataset/csv/'+date+'.csv', int(time[i]))
+                R, K, T = get_data_from_csv(path_csv, int(time[i]))
                 data.append([time[i], str(0), str(T[0][0]), str(T[2][0])])
                 flag=False
                 j+=1
@@ -32,7 +36,7 @@ def main(date):
             if index != -2:
                 if index != -1:
                     print(int(time[i]))
-                    R, K, T = get_data_from_csv(sys.path[-1]+'/dataset/csv/'+date+'.csv', int(time[i]))
+                    R, K, T = get_data_from_csv(path_csv, int(time[i]))
                     temporary_coordinate_camera = screenToCamera(coordinates[j], image, K)
                     print(temporary_coordinate_camera)
                     temporary_coordinate_world, direction = cameraToWorld(temporary_coordinate_camera, R, T)
@@ -43,7 +47,7 @@ def main(date):
                     print(data)
             j+=1
 
-    createDataText(sys.path[-1]+'\\socialgan\\datasets\\original\\scene6\\data.txt', data)
+    createDataText(path_input, data)
 
 if __name__ == '__main__':
     main('0413_1605_24')
