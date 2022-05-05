@@ -11,7 +11,7 @@ def get_foot_coordinates(path_image):
     res = cv2.resize(image, dsize=(416, 416), interpolation=cv2.INTER_CUBIC)
 
     classes = []
-    with open('yolov3/coco.names', 'r') as f:
+    with open('ctrans/yolov3/coco.names', 'r') as f:
         classes = [line.strip() for line in f.readlines()]
 
 
@@ -19,7 +19,7 @@ def get_foot_coordinates(path_image):
     Height = res.shape[0]
 
     # read pre-trained model and config file
-    net = cv2.dnn.readNet('yolov3/yolov3.weights', 'yolov3/yolov3.cfg')
+    net = cv2.dnn.readNet('ctrans/yolov3/yolov3.weights', 'ctrans/yolov3/yolov3.cfg')
 
     # create input blob 
     # set input blob for the network
@@ -159,7 +159,7 @@ def cameraToScreen(real_coordinate_camera, image, K):
 def plot(image, coordinates, path, color=(255,0,0)):
     for i in range(len(coordinates)):
         cv2.circle(image, coordinates[i], 5, color, -1)
-    cv2.imwrite(path, image)
+    cv2.imwrite(str(path), image)
     return image
 
 # boundary extraction
@@ -168,8 +168,8 @@ def extract_coordinates(R,K,T,mask_image):
     counter=100
     for delta_z in range(20):
         pre_color = None
-        for delta_x in range(-500,501):
-            real_coordinate = np.array([T[0][0]+0.01*delta_x,-1.35,T[2][0]-1*delta_z]).reshape(3,1)
+        for delta_x in range(-50,51):
+            real_coordinate = np.array([T[0][0]+0.1*delta_x,-1.35,T[2][0]-1*delta_z]).reshape(3,1)
             real_coordinate_camera = worldToCamera(real_coordinate, R, T)
             u,v = cameraToScreen(real_coordinate_camera, mask_image, K)
             if u<0 or u>=1440 or v<0 or v>=1920:

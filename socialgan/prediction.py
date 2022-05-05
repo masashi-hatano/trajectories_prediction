@@ -20,7 +20,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--model_path', type=str, default=sys.path[0]+'/models/sgan-p-models/eth_8_model.pt')
 parser.add_argument('--num_samples', default=1, type=int)
 parser.add_argument('--dset_type', default='test', type=str)
-parser.add_argument('--folder', default=sys.path[-1]+'/output/0413_1605_24/withSS/', type=str)
+parser.add_argument('--date', default='0129_1411_23', type=str)
+parser.add_argument('--input_type', default='withoutSS', choices=['withoutCtrans','withoutSS','withSS'])
 
 FORMAT = '[%(levelname)s: %(filename)s: %(lineno)4d]: %(message)s'
 logging.basicConfig(level=logging.INFO, format=FORMAT, stream=sys.stdout)
@@ -133,7 +134,7 @@ def convertToJson(folder, data_dir, pred_traj_fake):
     time_list = []
     PredTimeList = []
     counter = 0
-    with open(data_dir+'data.txt') as f:
+    with open(data_dir/Path('data.txt')) as f:
         for line in f:
             if counter >= pred_traj_fake.shape[1]:
                 break
@@ -156,7 +157,7 @@ def convertToJson(folder, data_dir, pred_traj_fake):
                 counter+=1
     dict_all = {"PredTimeList":PredTimeList}
     dict = sortJson(dict_all)
-    with open(folder+"pred_traj.json", "w") as f:
+    with open(folder/Path("pred_traj.json"), "w") as f:
         json.dump(dict, f, indent=4)
 
 def sortJson(dict):
@@ -211,7 +212,8 @@ def change(predlist, index, inverse, dict1, dict2):
     return predlist
 
 def main(args):
-    folder = args.folder
+    folder = Path('output',args.date, args.input_type)
+    path_datasets = Path('socialgan/datasets/original',args.date, args.input_type)
     if os.path.isdir(args.model_path):
         filenames = os.listdir(args.model_path)
         filenames.sort()
@@ -227,8 +229,7 @@ def main(args):
         generator = get_generator(checkpoint)
         logger.info(generator)
         _args = AttrDict(checkpoint['args'])
-        path = get_dset_path(_args.dataset_name, args.dset_type)
-        dset, loader = data_loader(_args, path)
+        dset, loader = data_loader(_args, path_datasets)
         _, _, pred_traj_fake = evaluate(_args, loader, generator, args.num_samples)
         print(pred_traj_fake)
         convertToJson(folder, dset.data_dir, pred_traj_fake)
