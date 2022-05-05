@@ -25,7 +25,7 @@ def parse_args():
     parser.add_argument('--savedir', default='semanseg/output/')
     parser.add_argument('--palette', default='cityscapes', help='Color palette used for segmentation map')
     parser.add_argument('--timestamp', default='ctrans/timestamp/')
-    parser.add_argument('--date', default='0413_1605_24')
+    parser.add_argument('--date', default='0129_1712_17')
     parser.add_argument('--interval', default=20, type=int)
     args = parser.parse_args()
     return args
