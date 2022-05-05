@@ -33,8 +33,8 @@ def main(date):
 
     for i in range(7,len(time)-8):
         R, K, T = get_data_from_csv(path_csv, int(time[i]))
-        path_img = path_img / Path(time[i]+'.jpg')
-        image = plt.imread(path_img)
+        path_image = path_img / Path(time[i]+'.jpg')
+        image = plt.imread(path_image)
         image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         #plt.imshow(image)
@@ -49,7 +49,7 @@ def main(date):
         while gt[j][0] not in time_current:
             j+=1
         while gt[j][0] in time_current:
-            if gt[j][1]!=str(0) and gt[j][1]<str(100):
+            if gt[j][1]!=str(0) and int(gt[j][1])<100:
                 real_coordinate = np.array([float(gt[j][2]),-1.35,float(gt[j][3])]).reshape(3,1)
                 real_coordinate_camera = worldToCamera(real_coordinate, R, T)
                 coordinates_gt.append(cameraToScreen(real_coordinate_camera, image, K))
@@ -63,7 +63,7 @@ def main(date):
         coordinates_pred = []
         pedlist_withoutSS = dict_json_withoutSS["PredTimeList"][i-7]["PedList"]
         for k in range(1,len(pedlist_withoutSS)):
-            if pedlist_withoutSS[k]["index"] < str(100):
+            if int(pedlist_withoutSS[k]["index"]) < 100:
                 pred_traj = pedlist_withoutSS[k]["pred_traj"]
                 for pred_traj_coordinates in pred_traj:
                     real_coordinate = np.array([pred_traj_coordinates[0],-1.35,pred_traj_coordinates[1]]).reshape(3,1)
@@ -75,7 +75,7 @@ def main(date):
         coordinates_pred = []
         pedlist_withSS = dict_json_withSS["PredTimeList"][i-7]["PedList"]
         for k in range(1,len(pedlist_withoutSS)):
-            if pedlist_withSS[k]["index"] < str(100):
+            if int(pedlist_withSS[k]["index"]) < 100:
                 pred_traj = pedlist_withSS[k]["pred_traj"]
                 for pred_traj_coordinates in pred_traj:
                     real_coordinate = np.array([pred_traj_coordinates[0],-1.35,pred_traj_coordinates[1]]).reshape(3,1)
@@ -85,4 +85,4 @@ def main(date):
         plot(image_ploted,coordinates_pred, path_output_img, color=(0,0,255))
 
 if __name__ == '__main__':
-    main('0413_1605_24')
+    main('0129_1411_23')

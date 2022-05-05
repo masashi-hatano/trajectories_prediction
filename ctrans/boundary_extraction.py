@@ -8,7 +8,7 @@ def parse_arg():
     parser = ArgumentParser()
     parser.add_argument('--imgdir', default='semanseg/output/mask/')
     parser.add_argument('--savedir', default='ctrans/output/')
-    parser.add_argument('--date', default='0413_1605_24')
+    parser.add_argument('--date', default='0129_1712_17')
     parser.add_argument('--inputdir', default='socialgan/datasets/original/')
     args = parser.parse_args()
     return args
