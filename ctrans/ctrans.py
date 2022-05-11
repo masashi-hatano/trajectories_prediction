@@ -48,7 +48,7 @@ def main(date):
                     print(real_coordinate)
                     data1.append([time[i], str(index), str(real_coordinate[0][0]), str(real_coordinate[2][0])])
                     print(data1)
-                    data2.append([time[i], str(index), str(coordinates[0][0]), str(coordinates[0][1])])
+                    data2.append([time[i], str(index), str(coordinates[j][0]), str(coordinates[j][1])])
             
             j+=1
 
