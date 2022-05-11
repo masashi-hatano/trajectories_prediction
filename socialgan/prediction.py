@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--model_path', type=str, default=sys.path[0]+'/models/sgan-p-models/eth_8_model.pt')
 parser.add_argument('--num_samples', default=1, type=int)
 parser.add_argument('--dset_type', default='test', type=str)
-parser.add_argument('--date', default='0129_1411_23', type=str)
+parser.add_argument('--date', default='0413_1638_54', type=str)
 parser.add_argument('--input_type', default='withoutCtrans', choices=['withoutCtrans','withoutSS','withSS'])
 
 FORMAT = '[%(levelname)s: %(filename)s: %(lineno)4d]: %(message)s'
