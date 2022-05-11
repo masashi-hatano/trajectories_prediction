@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+from pathlib import Path
 
 # human detection
 def get_foot_coordinates(path_image):
@@ -245,3 +246,19 @@ def create_timestamp(path, imgs_extracted):
         for i in range(len(imgs_extracted)):
             f.write(imgs_extracted[i]+'\n')
 
+# plot
+def convertToWorld(pred_traj, time, path_csv, path_img):
+    for i, predTimeList in enumerate(pred_traj["PredTimeList"]):
+        for pedList in predTimeList["PedList"]:
+            for j in range(1,9):
+                path_image = path_img / Path(time[i+j]+'.jpg')
+                image = plt.imread(path_image)
+                image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+
+                R, K, T = get_data_from_csv(path_csv, int(time[(i+7)+j]))
+                temporary_coordinate_camera = screenToCamera(pedList["pred_traj"][j-1], image, K)
+                _, direction = cameraToWorld(temporary_coordinate_camera, R, T)
+                real_coordinate = calculateRealCoordinate(T, direction, -1.35)
+
+                pedList["pred_traj"][j-1] = [real_coordinate[0][0],real_coordinate[2][0]]
+    return pred_traj
