@@ -21,7 +21,7 @@ parser.add_argument('--model_path', type=str, default=sys.path[0]+'/models/sgan-
 parser.add_argument('--num_samples', default=1, type=int)
 parser.add_argument('--dset_type', default='test', type=str)
 parser.add_argument('--date', default='0413_1638_54', type=str)
-parser.add_argument('--input_type', default='withoutCtrans', choices=['withoutCtrans','withoutSS','withSS'])
+parser.add_argument('--input_type', default='withSS', choices=['withoutCtrans','withoutSS','withSS'])
 
 FORMAT = '[%(levelname)s: %(filename)s: %(lineno)4d]: %(message)s'
 logging.basicConfig(level=logging.INFO, format=FORMAT, stream=sys.stdout)
@@ -131,6 +131,8 @@ def convertToJson(folder, data_dir, pred_traj_fake):
                 counter+=1
     dict_all = {"PredTimeList":PredTimeList}
     #dict = sortJson(dict_all)
+    if not os.path.exists(folder):
+        os.mkdir(folder)
     with open(folder/Path("pred_traj.json"), "w") as f:
         json.dump(dict_all, f, indent=4)
 
@@ -186,28 +188,31 @@ def change(predlist, index, inverse, dict1, dict2):
     return predlist
 
 def main(args):
-    folder = Path('output',args.date, args.input_type)
-    path_datasets = Path('socialgan/datasets/original',args.date, args.input_type)
-    if os.path.isdir(args.model_path):
-        filenames = os.listdir(args.model_path)
-        filenames.sort()
-        paths = [
-            os.path.join(args.model_path, file_) for file_ in filenames
-        ]
-        
-    else:
-        paths = [args.model_path]
+    with open('socialgan/dates.txt') as f:
+        for date in f:
+            date = date.strip()
+            folder = Path('output', date, args.input_type)
+            path_datasets = Path('socialgan/datasets/original', date, args.input_type)
+            if os.path.isdir(args.model_path):
+                filenames = os.listdir(args.model_path)
+                filenames.sort()
+                paths = [
+                    os.path.join(args.model_path, file_) for file_ in filenames
+                ]
+                
+            else:
+                paths = [args.model_path]
 
-    for path in paths:
-        checkpoint = torch.load(path, map_location=torch.device('cpu'))
-        generator = get_generator(checkpoint)
-        logger.info(generator)
-        _args = AttrDict(checkpoint['args'])
-        dset, loader = data_loader(_args, path_datasets)
-        _, _, pred_traj_fake = evaluate(_args, loader, generator, args.num_samples)
-        print(pred_traj_fake)
-        convertToJson(folder, dset.data_dir, pred_traj_fake)
-        #print('Dataset: {}, Pred Len: {}, ADE: {:.2f}, FDE: {:.2f}'.format(_args.dataset_name, _args.pred_len, ade, fde))
+            for path in paths:
+                checkpoint = torch.load(path, map_location=torch.device('cpu'))
+                generator = get_generator(checkpoint)
+                logger.info(generator)
+                _args = AttrDict(checkpoint['args'])
+                dset, loader = data_loader(_args, path_datasets)
+                _, _, pred_traj_fake = evaluate(_args, loader, generator, args.num_samples)
+                print(pred_traj_fake)
+                convertToJson(folder, dset.data_dir, pred_traj_fake)
+                #print('Dataset: {}, Pred Len: {}, ADE: {:.2f}, FDE: {:.2f}'.format(_args.dataset_name, _args.pred_len, ade, fde))
 
 
 if __name__ == '__main__':

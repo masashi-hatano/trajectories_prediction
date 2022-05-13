@@ -59,24 +59,24 @@ def writeCSV(path, date, eval1, eval2):
     df = pd.read_csv(path)
     for i, date_ in enumerate(df.date):
         if date_ == date:
-            df['w/o ctrans ADE'].iloc[i] = ade1
-            df['w/o ctrans FDE'].iloc[i] = fde1
-            df['w/ ctrans ADE'].iloc[i] = ade2
-            df['w/ ctrans FDE'].iloc[i] = fde2
+            df['w/o ss ADE'].iloc[i] = ade1
+            df['w/o ss FDE'].iloc[i] = fde1
+            df['w/ ss ADE'].iloc[i] = ade2
+            df['w/ ss FDE'].iloc[i] = fde2
 
     df.to_csv(path, index=False)
 
 def culculateAVG(path):
     df = pd.read_csv(path)
-    ade1 = df['w/o ctrans ADE'].mean()
-    fde1 = df['w/o ctrans FDE'].mean()
-    ade2 = df['w/ ctrans ADE'].mean()
-    fde2 = df['w/ ctrans FDE'].mean()
+    ade1 = df['w/o ss ADE'].mean()
+    fde1 = df['w/o ss FDE'].mean()
+    ade2 = df['w/ ss ADE'].mean()
+    fde2 = df['w/ ss FDE'].mean()
     data = {'date': 'TOTAL',
-            'w/o ctrans ADE': ade1,
-            'w/o ctrans FDE': fde1,
-            'w/ ctrans ADE': ade2,
-            'w/ ctrans FDE': fde2}
+            'w/o ss ADE': ade1,
+            'w/o ss FDE': fde1,
+            'w/ ss ADE': ade2,
+            'w/ ss FDE': fde2}
     df = df.append(data, ignore_index=True)
 
     df.to_csv(path, index=False)

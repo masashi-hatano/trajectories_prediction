@@ -5,6 +5,8 @@ from torch.nn import functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+from pathlib import Path
+import os
 
 from utils.util import convertToRGB
 from utils.class_names import get_palette
@@ -25,7 +27,7 @@ def parse_args():
     parser.add_argument('--savedir', default='semanseg/output/')
     parser.add_argument('--palette', default='cityscapes', help='Color palette used for segmentation map')
     parser.add_argument('--timestamp', default='ctrans/timestamp/')
-    parser.add_argument('--date', default='0129_1712_17')
+    parser.add_argument('--date', default='0413_1628_24')
     parser.add_argument('--interval', default=20, type=int)
     args = parser.parse_args()
     return args
@@ -41,36 +43,48 @@ def main():
     device = torch.device(args.device)
     model = model.to(device)
     
-    with open(args.timestamp+args.date+'.txt') as f:
-        time = []
-        for line in f:
-            time.append(line.strip())
-        
-    for i in range(0,len(time),int(1.6*args.interval)):
-        # prepare image
-        image = cv2.imread(args.img+args.date+'/'+time[i]+'.jpg')
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    with open('semanseg/dates.txt') as f:
+        for date in f:
+            date = date.strip()
+            with open(Path(args.timestamp, date+'.txt')) as f:
+                time = []
+                for line in f:
+                    time.append(line.strip())
+            for i in range(0,len(time),int(1.6*args.interval)):
+                # prepare image
+                path_img = Path(args.img, date, time[i]+'.jpg')
+                image = cv2.imread(str(path_img))
+                image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-        # test a single image
-        model.to(args.device)
-        model.eval()
-        with torch.no_grad():
-            inputs = feature_extractor(images=image, return_tensors="pt")
-            inputs_tensor = inputs['pixel_values'].cuda()
-            outputs = model(inputs_tensor)
-            pred = outputs.logits
+                # test a single image
+                model.to(args.device)
+                model.eval()
+                with torch.no_grad():
+                    inputs = feature_extractor(images=image, return_tensors="pt")
+                    inputs_tensor = inputs['pixel_values'].cuda()
+                    outputs = model(inputs_tensor)
+                    pred = outputs.logits
 
-        # palette to rgb
-        pred_rgb = paletteToRGB(pred, args.size, get_palette(args.palette))
+                # palette to rgb
+                pred_rgb = paletteToRGB(pred, args.size, get_palette(args.palette))
 
-        # create masked image
-        masked = paletteToRGB(pred, args.size, get_palette('mask'))
+                # create masked image
+                masked = paletteToRGB(pred, args.size, get_palette('mask'))
 
-        # save the segmented and masked images
-        pred_rgb = cv2.cvtColor(pred_rgb, cv2.COLOR_RGB2BGR)
-        masked = cv2.cvtColor(masked, cv2.COLOR_BGR2RGB)
-        cv2.imwrite(args.savedir+'seg/'+args.date+'/'+time[i]+'.jpg', pred_rgb)
-        cv2.imwrite(args.savedir+'mask/'+args.date+'/'+time[i]+'.jpg', masked)
+                # save the segmented and masked images
+                pred_rgb = cv2.cvtColor(pred_rgb, cv2.COLOR_RGB2BGR)
+                masked = cv2.cvtColor(masked, cv2.COLOR_BGR2RGB)
+
+                path_seg = Path(args.savedir, 'seg', date)
+                path_mask = Path(args.savedir, 'mask', date)
+
+                if not os.path.exists(path_seg):
+                    os.mkdir(path_seg)
+                if not os.path.exists(path_mask):
+                    os.mkdir(path_mask)
+
+                cv2.imwrite(str(path_seg/Path(time[i]+'.jpg')), pred_rgb)
+                cv2.imwrite(str(path_mask/Path(time[i]+'.jpg')), masked)
 
 
 if __name__ == '__main__':

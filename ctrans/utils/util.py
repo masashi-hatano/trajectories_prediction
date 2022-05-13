@@ -169,8 +169,8 @@ def extract_coordinates(R,K,T,mask_image):
     counter=100
     for delta_z in range(20):
         pre_color = None
-        for delta_x in range(-50,51):
-            real_coordinate = np.array([T[0][0]+0.1*delta_x,-1.35,T[2][0]-1*delta_z]).reshape(3,1)
+        for delta_x in range(-500,501):
+            real_coordinate = np.array([T[0][0]+0.01*delta_x,-1.35,T[2][0]-1*delta_z]).reshape(3,1)
             real_coordinate_camera = worldToCamera(real_coordinate, R, T)
             u,v = cameraToScreen(real_coordinate_camera, mask_image, K)
             if u<0 or u>=1440 or v<0 or v>=1920:

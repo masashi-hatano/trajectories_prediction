@@ -10,7 +10,7 @@ def main():
         for date in f:
             date = date.strip()
             path_gt = Path('socialgan/datasets/original', date, 'withoutSS/data.txt')
-            path_withoutCtrans = Path('output', date, 'withoutCtrans')
+            path_withSS = Path('output', date, 'withSS')
             path_withoutSS = Path('output', date, 'withoutSS')
             path_csv_result = Path('eval/result.csv')
 
@@ -28,7 +28,7 @@ def main():
                         ped_list.append(gt[-1][1])
             dict_gt = convertToJson(gt, time_list, ped_list)
 
-            with open(path_withoutCtrans/Path('pred_traj_world.json')) as f:
+            with open(path_withSS/Path('pred_traj.json')) as f:
                 dict_withoutCtrans = json.load(f)
 
             with open(path_withoutSS/Path('pred_traj.json')) as f:
