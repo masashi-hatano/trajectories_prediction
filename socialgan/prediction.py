@@ -20,8 +20,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--model_path', type=str, default=sys.path[0]+'/models/sgan-p-models/eth_8_model.pt')
 parser.add_argument('--num_samples', default=1, type=int)
 parser.add_argument('--dset_type', default='test', type=str)
-parser.add_argument('--date', default='0129_1411_23', type=str)
-parser.add_argument('--input_type', default='withoutSS', choices=['withoutCtrans','withoutSS','withSS'])
+parser.add_argument('--date', default='0413_1638_54', type=str)
+parser.add_argument('--input_type', default='withoutCtrans', choices=['withoutCtrans','withoutSS','withSS'])
 
 FORMAT = '[%(levelname)s: %(filename)s: %(lineno)4d]: %(message)s'
 logging.basicConfig(level=logging.INFO, format=FORMAT, stream=sys.stdout)
@@ -103,32 +103,6 @@ def evaluate(args, loader, generator, num_samples):
         fde = sum(fde_outer) / (total_traj)
         return ade, fde, pred_traj_fake
 
-def createPredictedDataFile(data_dir, pred_traj_fake):
-    data_list = []
-    id_list = []
-    with open(data_dir+'data.txt') as f:
-        for line in f:
-            data_list.append(line.rstrip().split('\t'))
-            if data_list[-1][1] not in id_list:
-                id_list.append(data_list[-1][1])
-
-    data_pred_list = []
-    counter = []
-    for i in range(len(id_list)):
-        counter.append(0)
-    for i in range(len(data_list)):
-        if data_list[i][2] == '0' and data_list[i][3] == '0':
-            for j in range(len(id_list)):
-                if data_list[i][1] == id_list[j]:
-                    data_pred_list.append([data_list[i][0], id_list[j], str(pred_traj_fake[counter[j]][j][0].item()), str(pred_traj_fake[counter[j]][j][1].item())])
-                    counter[j] += 1
-    with open(data_dir+'output.txt', 'w') as f:
-        for i in range(len(data_pred_list)):
-            f.write(data_pred_list[i][0]+'\t'
-            +data_pred_list[i][1]+'\t'
-            +data_pred_list[i][2]+'\t'
-            +data_pred_list[i][3]+'\n')
-
 def convertToJson(folder, data_dir, pred_traj_fake):
     data_list = []
     time_list = []
@@ -156,9 +130,9 @@ def convertToJson(folder, data_dir, pred_traj_fake):
                 PredTimeList[-1]["PedList"].append(dict)
                 counter+=1
     dict_all = {"PredTimeList":PredTimeList}
-    dict = sortJson(dict_all)
+    #dict = sortJson(dict_all)
     with open(folder/Path("pred_traj.json"), "w") as f:
-        json.dump(dict, f, indent=4)
+        json.dump(dict_all, f, indent=4)
 
 def sortJson(dict):
     predlist = dict["PredTimeList"]
@@ -233,7 +207,6 @@ def main(args):
         _, _, pred_traj_fake = evaluate(_args, loader, generator, args.num_samples)
         print(pred_traj_fake)
         convertToJson(folder, dset.data_dir, pred_traj_fake)
-        #createPredictedDataFile(dset.data_dir, pred_traj_fake)
         #print('Dataset: {}, Pred Len: {}, ADE: {:.2f}, FDE: {:.2f}'.format(_args.dataset_name, _args.pred_len, ade, fde))
 
 
