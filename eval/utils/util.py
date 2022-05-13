@@ -1,6 +1,7 @@
 from operator import itemgetter
 import numpy as np
 import pandas as pd
+from torch import deg2rad
 
 
 def convertToJson(data, time_list, ped_list):
@@ -63,5 +64,19 @@ def writeCSV(path, date, eval1, eval2):
             df['w/ ctrans ADE'].iloc[i] = ade2
             df['w/ ctrans FDE'].iloc[i] = fde2
 
-    df.to_csv('eval/result.csv', index=False)
-    df.to_excel('eval/result.xlsx', index=False)
+    df.to_csv(path, index=False)
+
+def culculateAVG(path):
+    df = pd.read_csv(path)
+    ade1 = df['w/o ctrans ADE'].mean()
+    fde1 = df['w/o ctrans FDE'].mean()
+    ade2 = df['w/ ctrans ADE'].mean()
+    fde2 = df['w/ ctrans ADE'].mean()
+    data = {'date': 'TOTAL',
+            'w/o ctrans ADE': ade1,
+            'w/o ctrans FDE': fde1,
+            'w/ ctrans ADE': ade2,
+            'w/ ctrans FDE': fde2}
+    df = df.append(data, ignore_index=True)
+
+    df.to_csv(path, index=False)

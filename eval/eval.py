@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
 
-from utils.util import convertToJson, eval, writeCSV
+from utils.util import convertToJson, eval, writeCSV, culculateAVG
 
 def main():
     path_dates = Path('eval/dates.txt')
@@ -41,8 +41,8 @@ def main():
             eval_withoutSS = eval(dict_gt, dict_withoutSS)
             
             writeCSV(path_csv_result, date, eval_withoutCtrans, eval_withoutSS)
-
-
+        
+    culculateAVG(path_csv_result)
 
 if __name__=='__main__':
     main()
