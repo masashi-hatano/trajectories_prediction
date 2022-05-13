@@ -71,7 +71,7 @@ def culculateAVG(path):
     ade1 = df['w/o ctrans ADE'].mean()
     fde1 = df['w/o ctrans FDE'].mean()
     ade2 = df['w/ ctrans ADE'].mean()
-    fde2 = df['w/ ctrans ADE'].mean()
+    fde2 = df['w/ ctrans FDE'].mean()
     data = {'date': 'TOTAL',
             'w/o ctrans ADE': ade1,
             'w/o ctrans FDE': fde1,
