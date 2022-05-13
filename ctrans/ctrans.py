@@ -1,3 +1,4 @@
+from operator import itemgetter
 from pathlib import Path
 
 from utils.util import get_foot_coordinates, get_data_from_csv, screenToCamera, cameraToWorld, calculateRealCoordinate, createDataText
@@ -52,8 +53,8 @@ def main(date):
             
             j+=1
 
-    createDataText(path_input_ctrans, data1)
-    createDataText(path_input_coordinate, data2)
+    createDataText(path_input_ctrans, sorted(data1, key=itemgetter(0,1)))
+    createDataText(path_input_coordinate, sorted(data2, key=itemgetter(0,1)))
 
 if __name__ == '__main__':
     main('0413_1638_54')
