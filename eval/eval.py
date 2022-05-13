@@ -12,7 +12,7 @@ def main():
             path_gt = Path('socialgan/datasets/original', date, 'withoutSS/data.txt')
             path_withSS = Path('output', date, 'withSS')
             path_withoutSS = Path('output', date, 'withoutSS')
-            path_csv_result = Path('eval/result.csv')
+            path_csv_result = Path('eval/result_distance.csv')
 
             with open(path_gt) as f:
                 gt = []
