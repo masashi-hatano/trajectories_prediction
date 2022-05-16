@@ -18,7 +18,7 @@ sys.path.append(str(Path('prediction.py').resolve().parent.parent))
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_path', type=str, default=sys.path[0]+'/models/sgan-p-models/eth_8_model.pt')
-parser.add_argument('--num_samples', default=1, type=int)
+parser.add_argument('--num_samples', default=1000, type=int)
 parser.add_argument('--dset_type', default='test', type=str)
 parser.add_argument('--date', default='0413_1638_54', type=str)
 parser.add_argument('--input_type', default='withSS', choices=['withoutCtrans','withoutSS','withSS'])
@@ -136,56 +136,56 @@ def convertToJson(folder, data_dir, pred_traj_fake):
     with open(folder/Path("pred_traj.json"), "w") as f:
         json.dump(dict_all, f, indent=4)
 
-def sortJson(dict):
-    predlist = dict["PredTimeList"]
-    counter=0
-    inverse = False
-    while counter < len(predlist)-1:
-        if not inverse:
-            dict1_after, dict2_after, changed = sort(predlist[counter], predlist[counter+1])
-            if changed:
-                predlist = change(predlist, counter, inverse, dict1_after, dict2_after)
-                if counter > 0:
-                    inverse = True
-                else:
-                    counter+=1
-            else:
-                counter+=1
-        else:
-            dict1_after, dict2_after, changed = sort(predlist[counter-1], predlist[counter])
-            if changed:
-                predlist = change(predlist, counter, inverse, dict1_after, dict2_after)
-                if counter > 1:
-                    inverse = True
-                    counter-=1
-                else:
-                    inverse = False
-            else:
-                inverse = False
-                counter+=1
-    dict["PredTimeList"] = predlist
-    return dict
+# def sortJson(dict):
+#     predlist = dict["PredTimeList"]
+#     counter=0
+#     inverse = False
+#     while counter < len(predlist)-1:
+#         if not inverse:
+#             dict1_after, dict2_after, changed = sort(predlist[counter], predlist[counter+1])
+#             if changed:
+#                 predlist = change(predlist, counter, inverse, dict1_after, dict2_after)
+#                 if counter > 0:
+#                     inverse = True
+#                 else:
+#                     counter+=1
+#             else:
+#                 counter+=1
+#         else:
+#             dict1_after, dict2_after, changed = sort(predlist[counter-1], predlist[counter])
+#             if changed:
+#                 predlist = change(predlist, counter, inverse, dict1_after, dict2_after)
+#                 if counter > 1:
+#                     inverse = True
+#                     counter-=1
+#                 else:
+#                     inverse = False
+#             else:
+#                 inverse = False
+#                 counter+=1
+#     dict["PredTimeList"] = predlist
+#     return dict
 
-def sort(dict1, dict2):
-    changed = False
-    if dict1["PedList"][0]["pred_traj"][0][1] > dict2["PedList"][0]["pred_traj"][0][1]:
-        dict1_after = dict1
-        dict2_after = dict2
-    else:
-        dict1_after = dict2
-        dict2_after = dict1
-        changed = True
-    return dict1_after, dict2_after, changed
+# def sort(dict1, dict2):
+#     changed = False
+#     if dict1["PedList"][0]["pred_traj"][0][1] > dict2["PedList"][0]["pred_traj"][0][1]:
+#         dict1_after = dict1
+#         dict2_after = dict2
+#     else:
+#         dict1_after = dict2
+#         dict2_after = dict1
+#         changed = True
+#     return dict1_after, dict2_after, changed
 
-def change(predlist, index, inverse, dict1, dict2):
-    dict1["PedList"], dict2["PedList"] = dict2["PedList"], dict1["PedList"]
-    if not inverse:
-        predlist[index] = dict2
-        predlist[index+1] = dict1
-    else:
-        predlist[index-1] = dict2
-        predlist[index] = dict1
-    return predlist
+#  def change(predlist, index, inverse, dict1, dict2):
+#     dict1["PedList"], dict2["PedList"] = dict2["PedList"], dict1["PedList"]
+#     if not inverse:
+#         predlist[index] = dict2
+#         predlist[index+1] = dict1
+#     else:
+#         predlist[index-1] = dict2
+#         predlist[index] = dict1
+#     return predlist
 
 def main(args):
     with open('socialgan/dates.txt') as f:
