@@ -17,7 +17,7 @@ from sgan.utils import relative_to_abs, get_dset_path
 sys.path.append(str(Path('prediction.py').resolve().parent.parent))
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--model_path', type=str, default=sys.path[0]+'/models/sgan-p-models/eth_8_model.pt')
+parser.add_argument('--model_path', type=str, default=sys.path[0]+'/models/sgan-p-models/zara1_8_model.pt')
 parser.add_argument('--num_samples', default=1000, type=int)
 parser.add_argument('--dset_type', default='test', type=str)
 parser.add_argument('--date', default='0413_1638_54', type=str)
