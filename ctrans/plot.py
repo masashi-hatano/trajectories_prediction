@@ -14,10 +14,10 @@ def main(date):
     path_img = Path('dataset/images', date)
     path_csv = Path('dataset/csv',date+'.csv')
     path_input = Path('socialgan/datasets/original',date)
-    path_input_withoutSS = path_input / Path('withoutSS/data.txt')
+    path_input_withoutSS = path_input / Path('multi/data.txt')
     path_output = Path('output',date)
     path_output_withoutSS_json = path_output / Path('withoutSS/pred_traj.json')
-    path_output_withoutCtrans_json = path_output / Path('withoutCtrans/pred_traj.json')
+    path_output_withoutSP_json = path_output / Path('single/merge/pred_traj.json')
 
     with open(path_timestamp) as f:
         for line in f:
@@ -28,12 +28,12 @@ def main(date):
             gt.append(line.strip().split('\t'))
     with open(path_output_withoutSS_json) as f:
         dict_json_withoutSS = json.load(f)
-    with open(path_output_withoutCtrans_json) as f:
-        dict_json_withoutCtrans = json.load(f)
+    with open(path_output_withoutSP_json) as f:
+        dict_json_withoutSP = json.load(f)
     
-    dict_json_withoutCtrans_world = convertToWorld(dict_json_withoutCtrans, time, path_csv, path_img)
-    with open(path_output/Path("withoutCtrans/pred_traj_world.json"), "w") as f:
-        json.dump(dict_json_withoutCtrans_world, f, indent=4)
+    # dict_json_withoutCtrans_world = convertToWorld(dict_json_withoutSP, time, path_csv, path_img)
+    # with open(path_output/Path("withoutCtrans/pred_traj_world.json"), "w") as f:
+    #     json.dump(dict_json_withoutCtrans_world, f, indent=4)
 
     for i in range(7,len(time)-8):
         R, K, T = get_data_from_csv(path_csv, int(time[i]))
@@ -77,7 +77,7 @@ def main(date):
         plot(image_ploted,coordinates_pred, path_output_img)
 
         coordinates_pred = []
-        pedlist_withoutCtrans = dict_json_withoutCtrans_world["PredTimeList"][i-7]["PedList"]
+        pedlist_withoutCtrans = dict_json_withoutSP["PredTimeList"][i-7]["PedList"]
         for k in range(len(pedlist_withoutCtrans)):
             if int(pedlist_withoutCtrans[k]["index"]) < 100:
                 pred_traj = pedlist_withoutCtrans[k]["pred_traj"]
@@ -89,4 +89,4 @@ def main(date):
         plot(image_ploted,coordinates_pred, path_output_img, color=(0,0,255))
 
 if __name__ == '__main__':
-    main('0413_1638_54')
+    main('0129_1712_17')
