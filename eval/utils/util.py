@@ -1,6 +1,7 @@
 from operator import itemgetter
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def convertToJson(data, time_list, ped_list):
