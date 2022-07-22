@@ -1,7 +1,6 @@
 from operator import itemgetter
 import numpy as np
 import pandas as pd
-from torch import deg2rad
 
 
 def convertToJson(data, time_list, ped_list):
@@ -59,10 +58,10 @@ def writeCSV(path, date, eval1, eval2):
     df = pd.read_csv(path)
     for i, date_ in enumerate(df.date):
         if date_ == date:
-            df['w/o ctrans ADE'].iloc[i] = ade1
-            df['w/o ctrans FDE'].iloc[i] = fde1
-            df['w/ ctrans ADE'].iloc[i] = ade2
-            df['w/ ctrans FDE'].iloc[i] = fde2
+            df['w/o SP ADE'].iloc[i] = ade1
+            df['w/o SP FDE'].iloc[i] = fde1
+            df['w/ SP ADE'].iloc[i] = ade2
+            df['w/ SP FDE'].iloc[i] = fde2
 
     df.to_csv(path, index=False)
 

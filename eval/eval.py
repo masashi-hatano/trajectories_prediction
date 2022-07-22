@@ -9,8 +9,8 @@ def main():
     with open(path_dates) as f:
         for date in f:
             date = date.strip()
-            path_gt = Path('socialgan/datasets/original', date, 'withoutSS/data.txt')
-            path_withoutCtrans = Path('output', date, 'withoutCtrans')
+            path_gt = Path('socialgan/datasets/original', date, 'multi/data.txt')
+            path_withoutSP = Path('output', date, 'single','merge')
             path_withoutSS = Path('output', date, 'withoutSS')
             path_csv_result = Path('eval/result.csv')
 
@@ -28,19 +28,19 @@ def main():
                         ped_list.append(gt[-1][1])
             dict_gt = convertToJson(gt, time_list, ped_list)
 
-            with open(path_withoutCtrans/Path('pred_traj_world.json')) as f:
-                dict_withoutCtrans = json.load(f)
+            with open(path_withoutSP/Path('pred_traj.json')) as f:
+                dict_withoutSP = json.load(f)
 
             with open(path_withoutSS/Path('pred_traj.json')) as f:
                 dict_withoutSS = json.load(f)
 
             # eval withoutCtrans
-            eval_withoutCtrans = eval(dict_gt, dict_withoutCtrans)
+            eval_withoutSP = eval(dict_gt, dict_withoutSP)
 
             # eval withoutSS
             eval_withoutSS = eval(dict_gt, dict_withoutSS)
             
-            writeCSV(path_csv_result, date, eval_withoutCtrans, eval_withoutSS)
+            writeCSV(path_csv_result, date, eval_withoutSP, eval_withoutSS)
         
     culculateAVG(path_csv_result)
 
